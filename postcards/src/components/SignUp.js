@@ -44,6 +44,7 @@ class SignUpForm extends Component {
 
     auth.doCreateUserWithEmailAndPassword(email, passwordOne)
       .then(authUser => {
+
           // Create a user in your own accessible Firebase Database too
           db.doCreateUser(authUser.uid, username, email)
           .then(() => {
@@ -52,10 +53,13 @@ class SignUpForm extends Component {
           })
           .catch(error => {
             this.setState(byPropKey('error', error));
+            console.log('here');
           });
+
         })
       .catch(error => {
         this.setState(byPropKey('error', error));
+        console.log('here2');
       });
 
     event.preventDefault();
