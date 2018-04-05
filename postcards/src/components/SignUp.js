@@ -49,7 +49,7 @@ class SignUpForm extends Component {
           db.doCreateUser(authUser.uid, username, email)
           .then(() => {
             this.setState(() => ({ ...INITIAL_STATE }));
-            history.push(routes.HOME);
+            history.push(routes.GROUP);
           })
           .catch(error => {
             this.setState(byPropKey('error', error));

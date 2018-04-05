@@ -6,7 +6,7 @@ import App from './components/App'; //import our component
 //load our CSS file
 import './components/index.css';
 
-//unregister service worker (conflicts with firebase)
+//unregister service worker (conflicts with firebase on chrome)
 unregister();
 
 //render the Application view
