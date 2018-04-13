@@ -1,89 +1,119 @@
 import React from 'react';
-import {MessageBox, MessageList} from './Messages';
+import { MessageBox, MessageList } from './Messages';
 import firebase from 'firebase';
-import {Link} from 'react-router-dom';
+import withAuthorization from './withAuthorization';
 
-import {Col, ListGroup, ListGroupItem, Well, Collapse, Button} from 'react-bootstrap';
+import { Col, ListGroup, ListGroupItem, Well, Collapse, Button } from 'react-bootstrap';
 
 class GroupLinks extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { textValue: '', group: {}}
+    this.state = { textValue: '' }
     this.updateText = this.updateText.bind(this);
+    this.handleClick = this.handleClick.bind(this);
     this.createNewGroup = this.createNewGroup.bind(this);
   }
 
-componentWillMount() {
-   var group = firebase.database().ref('groups')
-    group.on('value', (snapshot) => {
-      var groups = snapshot.val();
-      this.setState({group: groups});
-    }); 
-}
+  componentDidMount() {
+    var groupRef = firebase.database().ref('groups')
+
+    var groupsToDisplay = {};
+    groupRef.on('value', (snapshot) => {
+      var findGroups = {};
+      var currUser = firebase.auth().currentUser.uid;
+      var userGroupRef = firebase.database().ref('users/' + currUser + '/groups');
+      var allGroups = snapshot.val();
+      if (allGroups != null) {
+        userGroupRef.on('value', (snapshot) => {
+          findGroups = snapshot.val()
+          for (var key in findGroups) {
+            if (key in allGroups) {
+              groupsToDisplay[key] = allGroups[key];
+            }
+          }
+          this.setState({ group: groupsToDisplay });
+        })
+      }
+    })
+  }
 
   updateText(event) {
     this.setState({ textValue: event.target.value })
   }
 
+  //Creates a new group. The group is saved to firebase under a uniqueID, and the text value 
+  //entered by the user is saved as the group's groupName property.
+  //New groups are shown in the group list once created.
   createNewGroup(event) {
-      event.preventDefault();
-    var group = firebase.database().ref('groups')
-    var newGroup = group.child(this.state.textValue).key;
-    //history.push('groups/'+newGroup);
+    event.preventDefault();
+    this.setState({ group: '' })
+
+    var groupRef = firebase.database().ref('groups')
+    var currUser = firebase.auth().currentUser.uid;
+    var userRef = firebase.database().ref('users/' + currUser)
+    var newGroup = groupRef.push().key;
+    groupRef.child(newGroup).set({ groupName: this.state.textValue });
+    userRef.child('groups').child(newGroup).set(this.state.textValue);
+    this.setState({ newGroup: { [newGroup]: { groupName: this.state.textValue } } })
+
+  }
+
+  //Changes the groupID in state when the user clicks on a group in the list.
+  //This new state is then passed to the messageBox and messageList components.
+  handleClick(event) {
+    var thisComponent = this;
+    var id = event.target.id;
+    this.setState({ groupId: id });
   }
 
   render() {
-    var keys = Object.keys(this.state.group);
-    console.log(this.props.children);
-    var groups = keys.map((Group) => {
-      var url = "/groups/"+Group;
-      return <ListGroupItem><Link to={url}>{Group}</Link></ListGroupItem>
-    });
-    return (
-      <div>
-      <Col xs={4} s={2} m={2} className="Group-nav">
-        <h3>Groups</h3>
-        <ListGroup className="list-unstyled">
-          {groups}
-          <ListGroupItem className="create-Group-item">
-            <div>
-                <Button className="create-Group-btn" bsStyle="info" onClick={ ()=> this.setState({ open: !this.state.open })}>New Group</Button>
-                <Collapse in={this.state.open}>
+
+    if (this.state.group) {
+      //Item to be filled with available groups.
+      var groups = [];
+      //Populates list with names of available groups.
+      for (var obj in this.state.group) {
+        var groupId = this.state.group[obj].groupName;
+        var newItem = <ListGroupItem onClick={this.handleClick} id={obj}>{this.state.group[obj].groupName}</ListGroupItem>
+        groups.push(newItem);
+      }
+      return (
+        <div>
+          <Col xs={4} s={2} m={2} className="Group-nav">
+            <h3>Groups</h3>
+            <ListGroup className="list-unstyled">
+              {groups}
+              <ListGroupItem className="create-Group-item">
                 <div>
-                  <Well>
-                    <form>
-                      <textarea placeholder="Group Name..." name="text" value={this.state.textUpdate} onChange = {this.updateText} className="form-control"></textarea>
-                      <Button bsStyle="info" type="submit" onClick={this.createNewGroup}>Create</Button>
-                    </form>
-                  </Well>
+                  <Button className="create-Group-btn" bsStyle="info" onClick={() => this.setState({ open: !this.state.open })}>New Group</Button>
+                  <Collapse in={this.state.open}>
+                    <div>
+                      <Well>
+                        <form>
+                          <textarea placeholder="Group Name..." name="text" value={this.state.textUpdate} onChange={this.updateText} className="form-control"></textarea>
+                          <Button bsStyle="info" type="submit" onClick={this.createNewGroup}>Create</Button>
+                        </form>
+                      </Well>
+                    </div>
+                  </Collapse>
                 </div>
-                </Collapse>
-            </div>
-          </ListGroupItem>
-        </ListGroup>
-      </Col>
-      <Col xs={7} className="message-section">
-      {this.props.children}
-      </Col>
-      </div>
-    );
+              </ListGroupItem>
+            </ListGroup>
+          </Col>
+          <Col xs={7} className="message-section">
+
+            <MessageBox groupId={this.state.groupId} />
+            <MessageList groupId={this.state.groupId} />
+
+          </Col>
+        </div>
+      );
+    } else {
+      return null;
+    }
   }
 }
-export {GroupLinks};
 
-class Group extends React.Component {
-    componentWillMount() {
-        console.log(this.props.params);
-        console.log(this.props);
-    }
-    render() {
-        var groupId = this.props.params.groupId;
-        return (
-           <div>
-            <MessageBox groupId={groupId}/>
-            <MessageList groupId={groupId}/>
-            </div>
-        );
-    }
-}
-export default Group;
+const authCondition = (authUser) => !!authUser;
+
+export default withAuthorization(authCondition)(GroupLinks);

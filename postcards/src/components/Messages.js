@@ -2,6 +2,7 @@ import React from 'react';
 import Time from 'react-time'
 import firebase from 'firebase';
 //import noUserPic from './no-user-pic.png';
+
 import { Col, Collapse, Well, Modal, Button } from 'react-bootstrap';
 
 // A form the user can use to post a Message
@@ -16,25 +17,26 @@ export class MessageBox extends React.Component {
     this.setState({ post: event.target.value });
   }
 
-  //post a new Message to the database
+  //Posts a new Message to the database. These are saved under the group they belong to within
+  //a message child object. Information saved with each message includes a timestamp of when it was
+  //written, the user who wrote it, and what the content is.
   postMessage(event) {
     event.preventDefault(); //don't submit
 
-    /* Add a new Message to the database */
     var MessagesRef = firebase.database().ref('groups/' + this.props.groupId); //the Messages in the JOITC
     var newMessage = {
       text: this.state.post,
       userId: firebase.auth().currentUser.uid, //to look up Messageer info
       time: firebase.database.ServerValue.TIMESTAMP, //MAGIC
     };
-    MessagesRef.push(newMessage); //upload
+    MessagesRef.child('messages').push(newMessage); //upload
 
     this.setState({ post: '' }); //empty out post (controlled input)
   }
 
   render() {
     //var currentUser = firebase.auth().currentUser; //get the curent user
-
+    //console.log(this.props.groupId)
     return (
       <Col xs={7}>
         <div className="Message-box write-Message">
@@ -64,23 +66,16 @@ export class MessageList extends React.Component {
   constructor(props) {
     super(props);
     this.state = { Messages: [] };
-    this.componentDidMount = this.componentDidMount.bind(this);
   }
 
-  componentWillMount() {
-    if (!this.state.users) {
-      return null;
-    }
-    if (!this.state.groups[this.props.groupId]) {
-      return null;
-    }
-  }
   //Lifecycle callback executed when the component appears on the screen.
   //It is cleaner to use this than the constructor for fetching data
   componentDidMount() {
     /* Add a listener for changes to the user details object, and save in the state */
     var MessageRef = firebase.database().ref('groups/' + this.props.groupId);
+    //console.log(this.props.groupId)
     MessageRef.on('value', (snapshot) => {
+      //console.log(snapshot.val())
       this.setState({ messages: snapshot.val() });
     })
 
@@ -88,31 +83,24 @@ export class MessageList extends React.Component {
     usersRef.on('value', (snapshot) => {
       this.setState({ users: snapshot.val() });
     });
-
-    /* Add a listener for changes to the Messages object, and save in the state */
+    var groupObject = {};
+    var messageArray = [];
     var groupRef = firebase.database().ref('groups');
     groupRef.on('value', (snapshot) => {
-      var groupObject = {};
-      snapshot.forEach((child) => {
-        var messageArray = [];
-        child.forEach((groupMessage) => {
-          var message = groupMessage.val();
-          message.key = groupMessage.key;
-          var userId = message['userId'];
-          message['groupId'] = this.props.groupId;
-          var user = usersRef.child(userId);
-          message['user'] = user;
-          messageArray.push(message);
-        });
-        messageArray.sort((a, b) => b.time - a.time); //reverse order
-        groupObject[child.key] = messageArray;
-      });
-      this.setState({ groups: groupObject });
-      var messageList = Object.keys(groupObject).map((item) => {
-        return (groupObject[item])
+      this.setState({groups: snapshot.val()});
+      snapshot.forEach((group) => {
+        var groupMessages = [];
+        for(var message in group.val().messages) {
+          groupMessages.push(group.val().messages[message])
+        }
+        groupMessages.sort((a, b) => b.time - a.time);
+        groupObject[group.key] = groupMessages;
       })
-      this.setState({ listMessages: messageList[0]})
-    });
+      console.log(groupObject);
+      this.setState({allMessages: groupObject})
+
+    })
+    
 
   }
 
@@ -126,12 +114,16 @@ export class MessageList extends React.Component {
 
   render() {
     var messageItems = [];
+    console.log(this.props.groupId);
     //don't show if don't have message data yet (to avoid partial loads)
-    if (this.state && this.state.listMessages) {
-      for (var i = 0; i < this.state.listMessages.length; i++) {
-        var newMessage = <MessageItem Message={this.state.listMessages[i]}
-          group={this.state.listMessages[i].groupId}
-          user={this.state.listMessages[i].userId} />
+    if (this.state && this.state.allMessages && (this.props.groupId != null)) {
+      var groupToUse = this.state.allMessages[this.props.groupId]
+      console.log(groupToUse)
+      for (var i = 0; i < groupToUse.length; i++) {
+        console.log(groupToUse[i])
+        var newMessage = <MessageItem Message={groupToUse[i]}
+          // group={this.state.listMessages[i].groupId}
+          user={groupToUse[i].userId} />
         messageItems.push(newMessage);
       }
 
