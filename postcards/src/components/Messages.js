@@ -12,7 +12,7 @@ export class MessageBox extends React.Component {
     this.state = { post: '' };
   }
 
-  //when the text in the form changes
+  //when the text in the form changes, update state value
   updatePost(event) {
     this.setState({ post: event.target.value });
   }
@@ -35,8 +35,6 @@ export class MessageBox extends React.Component {
   }
 
   render() {
-    //var currentUser = firebase.auth().currentUser; //get the curent user
-    //console.log(this.props.groupId)
     return (
       <Col xs={7}>
         <div className="Message-box write-Message">
@@ -73,9 +71,7 @@ export class MessageList extends React.Component {
   componentDidMount() {
     /* Add a listener for changes to the user details object, and save in the state */
     var MessageRef = firebase.database().ref('groups/' + this.props.groupId);
-    //console.log(this.props.groupId)
     MessageRef.on('value', (snapshot) => {
-      //console.log(snapshot.val())
       this.setState({ messages: snapshot.val() });
     })
 
@@ -96,7 +92,6 @@ export class MessageList extends React.Component {
         groupMessages.sort((a, b) => b.time - a.time);
         groupObject[group.key] = groupMessages;
       })
-      console.log(groupObject);
       this.setState({allMessages: groupObject})
 
     })
@@ -114,15 +109,12 @@ export class MessageList extends React.Component {
 
   render() {
     var messageItems = [];
-    console.log(this.props.groupId);
     //don't show if don't have message data yet (to avoid partial loads)
     if (this.state && this.state.allMessages && (this.props.groupId != null)) {
       var groupToUse = this.state.allMessages[this.props.groupId]
-      console.log(groupToUse)
       for (var i = 0; i < groupToUse.length; i++) {
-        console.log(groupToUse[i])
+        console.log(groupToUse)
         var newMessage = <MessageItem Message={groupToUse[i]}
-          // group={this.state.listMessages[i].groupId}
           user={groupToUse[i].userId} />
         messageItems.push(newMessage);
       }
@@ -173,7 +165,8 @@ class MessageItem extends React.Component {
   //A method to "like" a Message
   likeMessage() {
     /* Access the Message in the firebase and add this user's name */
-    var MessageRef = firebase.database().ref('groups/' + this.props.group + '/' + this.props.Message.key);
+    console.log(this.props.Message)
+    var MessageRef = firebase.database().ref('groups/' + this.props.group + '/messages/' + this.props.Message.key);
     var MessageLikes = MessageRef.child('likes');
 
     //toggle logic

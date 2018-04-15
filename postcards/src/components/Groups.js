@@ -11,6 +11,7 @@ class GroupLinks extends React.Component {
     this.state = { textValue: '' }
     this.updateText = this.updateText.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.joinGroup = this.joinGroup.bind(this);
     this.createNewGroup = this.createNewGroup.bind(this);
   }
 
@@ -52,10 +53,28 @@ class GroupLinks extends React.Component {
     var currUser = firebase.auth().currentUser.uid;
     var userRef = firebase.database().ref('users/' + currUser)
     var newGroup = groupRef.push().key;
-    groupRef.child(newGroup).set({ groupName: this.state.textValue });
+    var groupCode = Math.floor(1000 + Math.random() * 9000);
+    groupRef.child(newGroup).set({ groupName: this.state.textValue, code: groupCode });
     userRef.child('groups').child(newGroup).set(this.state.textValue);
-    this.setState({ newGroup: { [newGroup]: { groupName: this.state.textValue } } })
+    this.setState({ newGroup: { [newGroup]: { groupName: this.state.textValue} } })
 
+  }
+
+  joinGroup(event) {
+    event.preventDefault();
+    var groupRef = firebase.database().ref('groups');
+    var enteredCode = this.state.textValue;
+    var userId = firebase.auth().currentUser.uid;
+    var userRef = firebase.database().ref('users/' +userId);
+    groupRef.on('value', (snapshot) => {
+      snapshot.forEach((group) => {
+        if (group.val().code == this.state.textValue) {
+          userRef.child('groups').child(group.key).set(group.val().groupName);
+          this.setState({newGroup: {[group]: {groupName: group.val().groupName}}})
+        }
+      })
+      
+    })
   }
 
   //Changes the groupID in state when the user clicks on a group in the list.
@@ -92,6 +111,21 @@ class GroupLinks extends React.Component {
                         <form>
                           <textarea placeholder="Group Name..." name="text" value={this.state.textUpdate} onChange={this.updateText} className="form-control"></textarea>
                           <Button bsStyle="info" type="submit" onClick={this.createNewGroup}>Create</Button>
+                        </form>
+                      </Well>
+                    </div>
+                  </Collapse>
+                </div>
+              </ListGroupItem>
+              <ListGroupItem className="join-Group-item">
+                <div>
+                  <Button className="join-Group-btn" bsStyle="info" onClick={() => this.setState({ openJoin: !this.state.openJoin })}>Join Group</Button>
+                  <Collapse in={this.state.openJoin}>
+                    <div>
+                      <Well>
+                        <form>
+                          <textarea placeholder="Enter Group Code..." name="text" value={this.state.textUpdate} onChange={this.updateText} className="form-control"></textarea>
+                          <Button bsStyle="info" type="submit" onClick={this.joinGroup}>Join</Button>
                         </form>
                       </Well>
                     </div>
