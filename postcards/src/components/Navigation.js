@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import AuthUserContext from './AuthUserContext';
 import * as routes from '../constants/routes';
 import SignOutButton from './SignOut';
+import {Nav, Navbar, NavItem} from 'react-bootstrap'
+
 
 const Navigation = () =>
   <AuthUserContext.Consumer>
@@ -21,9 +23,22 @@ const Navigation = () =>
   </ul>
 
 const NavigationNonAuth = () =>
+  <div>
   <ul>
     <li><Link to={routes.LANDING}>Landing</Link></li>
     <li><Link to={routes.SIGN_IN}>Sign In</Link></li>
   </ul>
+  <Navbar>
+    <Navbar.Header>
+      <Navbar.Brand>
+        <a href="#home">React-Bootstrap</a>
+      </Navbar.Brand>
+    </Navbar.Header>
+    <Nav>
+    <li><Link to={routes.LANDING}>Landing</Link></li>
+    <li><Link to={routes.SIGN_IN}>Sign In</Link></li>
+    </Nav>
+  </Navbar>
+  </div>
 
 export default Navigation;

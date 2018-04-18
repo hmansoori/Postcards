@@ -5,6 +5,9 @@ import {
 } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import * as routes from '../constants/routes';
+import { Button, FormGroup, FormControl } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
+
 
 
 const SignUpPage = ({ history }) =>
@@ -77,44 +80,67 @@ class SignUpForm extends Component {
     } = this.state;
 
     const isInvalid =
-      passwordOne !== passwordTwo ||
-      passwordOne === '' ||
-      email === '' ||
+      // passwordOne !== passwordTwo ||
+      // passwordOne === '' ||
+      // email === '' ||
       username === '';
 
+
     return (
-      <form onSubmit={this.onSubmit}>
-              <input
-          value={username}
-          onChange={event => this.setState(byPropKey('username', event.target.value))}
-          type="text"
-          placeholder="Full Name"
-        />
-        <input
-          value={email}
-          onChange={event => this.setState(byPropKey('email', event.target.value))}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          value={passwordOne}
-          onChange={event => this.setState(byPropKey('passwordOne', event.target.value))}
-          type="password"
-          placeholder="Password"
-        />
-        <input
-          value={passwordTwo}
-          onChange={event => this.setState(byPropKey('passwordTwo', event.target.value))}
-          type="password"
-          placeholder="Confirm Password"
-        />
-        <button disabled={isInvalid} type="submit">
-          Sign Up
-        </button>
+    //  <Col xs={12}>
+    <div>
+      <div className="container">
+          <h1>What name do you want to go by?</h1>
 
-        { error && <p>{error.message}</p> }
-
-      </form>
+          <form>
+            <FormGroup controlId="username">
+              <FormControl
+                  type="text"
+                  value={this.state.value}
+                  placeholder="Enter your name here"
+                  onChange={event => this.setState(byPropKey('username', event.target.value))}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <Button bsStyle="primary" disabled={isInvalid} type="submit">
+              Continue
+            </Button>
+          </form>
+      </div>
+    </div>
+      //</Col>
+      // <form onSubmit={this.onSubmit}>
+      //         <input
+      //     value={username}
+      //     onChange={event => this.setState(byPropKey('username', event.target.value))}
+      //     type="text"
+      //     placeholder="Full Name"
+      //   />
+      //   <input
+      //     value={email}
+      //     onChange={event => this.setState(byPropKey('email', event.target.value))}
+      //     type="text"
+      //     placeholder="Email Address"
+      //   />
+      //   <input
+      //     value={passwordOne}
+      //     onChange={event => this.setState(byPropKey('passwordOne', event.target.value))}
+      //     type="password"
+      //     placeholder="Password"
+      //   />
+      //   <input
+      //     value={passwordTwo}
+      //     onChange={event => this.setState(byPropKey('passwordTwo', event.target.value))}
+      //     type="password"
+      //     placeholder="Confirm Password"
+      //   />
+      //   <button disabled={isInvalid} type="submit">
+      //     Sign Up
+      //   </button>
+      //
+      //   { error && <p>{error.message}</p> }
+      //
+      // </form>
     );
   }
 }

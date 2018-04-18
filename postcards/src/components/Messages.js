@@ -93,25 +93,26 @@ export class MessageList extends React.Component {
     var groupRef = firebase.database().ref('groups');
     groupRef.on('value', (snapshot) => {
       var groupObject = {};
-      snapshot.forEach((child) => {
-        var messageArray = [];
-        child.forEach((groupMessage) => {
-          var message = groupMessage.val();
-          message.key = groupMessage.key;
-          var userId = message['userId'];
-          message['groupId'] = this.props.groupId;
-          var user = usersRef.child(userId);
-          message['user'] = user;
-          messageArray.push(message);
-        });
-        messageArray.sort((a, b) => b.time - a.time); //reverse order
-        groupObject[child.key] = messageArray;
-      });
-      this.setState({ groups: groupObject });
-      var messageList = Object.keys(groupObject).map((item) => {
-        return (groupObject[item])
-      })
-      this.setState({ listMessages: messageList[0]})
+      console.log("group object")
+      // snapshot.forEach((child) => {
+      //   var messageArray = [];
+      //   child.forEach((groupMessage) => {
+      //     var message = groupMessage.val();
+      //     message.key = groupMessage.key;
+      //     var userId = message['userId'];
+      //     message['groupId'] = this.props.groupId;
+      //     var user = usersRef.child(userId);
+      //     message['user'] = user;
+      //     messageArray.push(message);
+      //   });
+      //   messageArray.sort((a, b) => b.time - a.time); //reverse order
+      //   groupObject[child.key] = messageArray;
+      // });
+      // this.setState({ groups: groupObject });
+      // var messageList = Object.keys(groupObject).map((item) => {
+      //   return (groupObject[item])
+      // })
+      // this.setState({ listMessages: messageList[0]})
     });
 
   }
