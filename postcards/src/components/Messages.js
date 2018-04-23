@@ -1,6 +1,7 @@
 import React from 'react';
 import Time from 'react-time'
 import firebase from 'firebase';
+
 //import noUserPic from './no-user-pic.png';
 
 import { Col, Collapse, Well, Modal, Button } from 'react-bootstrap';
@@ -9,7 +10,62 @@ import { Col, Collapse, Well, Modal, Button } from 'react-bootstrap';
 export class MessageBox extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { post: '' };
+    this.state = { post: '', file: '', imagePreviewUrl: '' };
+    this._handleSubmit = this._handleSubmit.bind(this);
+  }
+
+
+  _handleSubmit(e) {
+    e.preventDefault();
+    // TODO: do something with -> this.state.file
+    var storageRef = firebase.storage().ref('/images').child(this.state.file.name);
+    var uploadTask = storageRef.put(this.state.file);
+    var groupId = this.props.groupId;
+    uploadTask.on('state_changed', function(snapshot){
+      // Observe state change events such as progress, pause, and resume
+      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case firebase.storage.TaskState.PAUSED: // or 'paused'
+          console.log('Upload is paused');
+          break;
+        case firebase.storage.TaskState.RUNNING: // or 'running'
+          console.log('Upload is running');
+          break;
+      }
+    }, function(error) {
+      // Handle unsuccessful uploads
+    }, function() {
+      // Handle successful uploads on complete
+      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+      var downloadURL = uploadTask.snapshot.downloadURL;
+      var messageRef = firebase.database().ref('groups/' + groupId);
+      var newMessage = {
+        type: "image",
+        image: downloadURL,
+        userId: firebase.auth().currentUser.uid,
+        time: firebase.database.ServerValue.TIMESTAMP,
+      };
+      messageRef.child('messages').push(newMessage);
+      
+    });
+    this.setState({file: '', imagePreviewUrl: ''})
+  }
+
+  _handleImageChange(e) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+    reader.onloadend = () => {
+      this.setState({
+        file: file,
+        imagePreviewUrl: reader.result
+      });
+    }
+
+    reader.readAsDataURL(file)
   }
 
   //when the text in the form changes, update state value
@@ -25,6 +81,7 @@ export class MessageBox extends React.Component {
 
     var MessagesRef = firebase.database().ref('groups/' + this.props.groupId); //the Messages in the JOITC
     var newMessage = {
+      type: 'text',
       text: this.state.post,
       userId: firebase.auth().currentUser.uid, //to look up Messageer info
       time: firebase.database.ServerValue.TIMESTAMP, //MAGIC
@@ -35,6 +92,13 @@ export class MessageBox extends React.Component {
   }
 
   render() {
+    let { imagePreviewUrl } = this.state;
+    let $imagePreview = null;
+    if (imagePreviewUrl) {
+      $imagePreview = (<img src={imagePreviewUrl} height='300' width='500'/>);
+    } else {
+      $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
+    }
     return (
       <Col xs={7}>
         <div className="Message-box write-Message">
@@ -51,6 +115,19 @@ export class MessageBox extends React.Component {
                 onClick={(e) => this.postMessage(e)} >
                 <i className="fa fa-pencil-square-o" aria-hidden="true"></i> Share
             </Button>
+              <div className="previewComponent">
+                <form onSubmit={(e) => this._handleSubmit(e)}>
+                  <input className="fileInput"
+                    type="file"
+                    onChange={(e) => this._handleImageChange(e)} />
+                  <button className="submitButton"
+                    type="submit"
+                    onClick={(e) => this._handleSubmit(e)}>Upload Image</button>
+                </form>
+                <div className="imgPreview">
+                  {$imagePreview}
+                </div>
+              </div>
             </div>
           </form>
         </div>
@@ -83,19 +160,21 @@ export class MessageList extends React.Component {
     var messageArray = [];
     var groupRef = firebase.database().ref('groups');
     groupRef.on('value', (snapshot) => {
-      this.setState({groups: snapshot.val()});
+      this.setState({ groups: snapshot.val() });
       snapshot.forEach((group) => {
         var groupMessages = [];
-        for(var message in group.val().messages) {
-          groupMessages.push(group.val().messages[message])
+        for (var message in group.val().messages) {
+          var item = group.val().messages[message];
+          item.key = message;
+          groupMessages.push(item)
         }
         groupMessages.sort((a, b) => b.time - a.time);
         groupObject[group.key] = groupMessages;
       })
-      this.setState({allMessages: groupObject})
+      this.setState({ allMessages: groupObject })
 
     })
-    
+
 
   }
 
@@ -113,9 +192,8 @@ export class MessageList extends React.Component {
     if (this.state && this.state.allMessages && (this.props.groupId != null)) {
       var groupToUse = this.state.allMessages[this.props.groupId]
       for (var i = 0; i < groupToUse.length; i++) {
-        console.log(groupToUse)
         var newMessage = <MessageItem Message={groupToUse[i]}
-          user={groupToUse[i].userId} />
+          user={groupToUse[i].userId} group={this.props.groupId}/>
         messageItems.push(newMessage);
       }
 
@@ -165,7 +243,6 @@ class MessageItem extends React.Component {
   //A method to "like" a Message
   likeMessage() {
     /* Access the Message in the firebase and add this user's name */
-    console.log(this.props.Message)
     var MessageRef = firebase.database().ref('groups/' + this.props.group + '/messages/' + this.props.Message.key);
     var MessageLikes = MessageRef.child('likes');
 
@@ -210,7 +287,9 @@ class MessageItem extends React.Component {
               {/* Show the time of the Message (use a Time component!) */}
               <span className="time"><Time value={this.props.Message.time} relative /></span>
             </div>
-
+            {this.props.Message.image &&
+            <div className="image"><img src={this.props.Message.image} height='300' width='500'/></div>
+            }
             {/* Show the text of the Message */}
             <div className="Message">{this.props.Message.text}</div>
 
@@ -248,7 +327,7 @@ class EditBar extends React.Component {
   }
 
   deleteMessage() {
-    var messageRef = firebase.database().ref('groups/' + this.props.group);
+    var messageRef = firebase.database().ref('groups/' + this.props.group +'/messages');
     messageRef.child(this.props.message.key).remove();
     this.setState({ showModal: false });
 
@@ -256,7 +335,7 @@ class EditBar extends React.Component {
 
   editMessage(event) {
     event.preventDefault();
-    var messageRef = firebase.database().ref('groups/' + this.props.group + '/' + this.props.message.key);
+    var messageRef = firebase.database().ref('groups/' + this.props.group + '/messages/' + this.props.message.key);
     messageRef.child('text').set(this.state.textUpdate);
     this.setState({ textUpdate: '' });
   }

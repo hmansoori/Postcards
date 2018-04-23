@@ -15,6 +15,8 @@ class GroupLinks extends React.Component {
     this.createNewGroup = this.createNewGroup.bind(this);
   }
 
+  //Pull all groups that the current user is associated with from firebase.
+  //Results in object of all group objects that is used to populate group list.
   componentDidMount() {
     var groupRef = firebase.database().ref('groups')
 
@@ -38,6 +40,7 @@ class GroupLinks extends React.Component {
     })
   }
 
+  //Keeps track of user input in text boxes for joining and creating new groups.
   updateText(event) {
     this.setState({ textValue: event.target.value })
   }
@@ -60,16 +63,21 @@ class GroupLinks extends React.Component {
 
   }
 
+  //Allows the user to join an existing group by entering in the four digit group code
+  //associated with it. If the group is found, the group is added to the user's list
+  //of accessible groups.
   joinGroup(event) {
     event.preventDefault();
     var groupRef = firebase.database().ref('groups');
-    var enteredCode = this.state.textValue;
     var userId = firebase.auth().currentUser.uid;
     var userRef = firebase.database().ref('users/' +userId);
     groupRef.on('value', (snapshot) => {
       snapshot.forEach((group) => {
+        console.log(group.val().code)
+        console.log(this.state.textValue)
         if (group.val().code == this.state.textValue) {
           userRef.child('groups').child(group.key).set(group.val().groupName);
+          console.log('here3')
           this.setState({newGroup: {[group]: {groupName: group.val().groupName}}})
         }
       })
@@ -86,7 +94,6 @@ class GroupLinks extends React.Component {
   }
 
   render() {
-
     if (this.state.group) {
       //Item to be filled with available groups.
       var groups = [];
@@ -102,6 +109,8 @@ class GroupLinks extends React.Component {
             <h3>Groups</h3>
             <ListGroup className="list-unstyled">
               {groups}
+
+              {/*Button letting users create a new group*/}
               <ListGroupItem className="create-Group-item">
                 <div>
                   <Button className="create-Group-btn" bsStyle="info" onClick={() => this.setState({ open: !this.state.open })}>New Group</Button>
@@ -117,6 +126,8 @@ class GroupLinks extends React.Component {
                   </Collapse>
                 </div>
               </ListGroupItem>
+
+              {/*Button letting users join groups*/}
               <ListGroupItem className="join-Group-item">
                 <div>
                   <Button className="join-Group-btn" bsStyle="info" onClick={() => this.setState({ openJoin: !this.state.openJoin })}>Join Group</Button>
@@ -136,15 +147,16 @@ class GroupLinks extends React.Component {
           </Col>
           <Col xs={7} className="message-section">
 
+        {/*render components to create new messages and display existing messages*/}
             <MessageBox groupId={this.state.groupId} />
             <MessageList groupId={this.state.groupId} />
 
           </Col>
         </div>
       );
-    } else {
+    } else { //If the user currently has no groups, do not render groupList component in full
       return null;
-    }
+  }
   }
 }
 
