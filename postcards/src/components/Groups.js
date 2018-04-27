@@ -106,7 +106,7 @@ class GroupLinks extends React.Component {
       return (
         <div>
           <Col xs={4} s={2} m={2} className="Group-nav">
-            <h3>Groups</h3>
+            <h3>Your Groups</h3>
             <ListGroup className="list-unstyled">
               {groups}
 
@@ -145,7 +145,7 @@ class GroupLinks extends React.Component {
               </ListGroupItem>
             </ListGroup>
           </Col>
-          <Col xs={7} className="message-section">
+          <Col xs={8} className="message-section">
 
         {/*render components to create new messages and display existing messages*/}
             <MessageBox groupId={this.state.groupId} />

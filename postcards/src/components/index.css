@@ -4,3 +4,17 @@ body {
   font-family: sans-serif;
 }
 
+.Message-box {
+  padding: 20px;
+  width: 600px;
+  height: 400px;
+  text-align: center;
+  margin: auto;
+  border: 2px black;
+  
+
+}
+
+.message-section {
+  text-align: center;
+}

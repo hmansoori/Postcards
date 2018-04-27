@@ -1,10 +1,10 @@
 import React from 'react';
 import Time from 'react-time'
-import firebase from 'firebase';
+import firebase from 'firebase'
 
 //import noUserPic from './no-user-pic.png';
 
-import { Col, Collapse, Well, Modal, Button } from 'react-bootstrap';
+import { Col, Collapse, Well, Modal, Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
 
 // A form the user can use to post a Message
 export class MessageBox extends React.Component {
@@ -12,6 +12,11 @@ export class MessageBox extends React.Component {
     super(props);
     this.state = { post: '', file: '', imagePreviewUrl: '' };
     this._handleSubmit = this._handleSubmit.bind(this);
+    this.updatePost = this.updatePost.bind(this);
+  }
+
+  updatePost(event) {
+    this.setState({ textUpdate: event.target.value });
   }
 
 
@@ -21,7 +26,7 @@ export class MessageBox extends React.Component {
     var storageRef = firebase.storage().ref('/images').child(this.state.file.name);
     var uploadTask = storageRef.put(this.state.file);
     var groupId = this.props.groupId;
-    uploadTask.on('state_changed', function(snapshot){
+    uploadTask.on('state_changed', function (snapshot) {
       // Observe state change events such as progress, pause, and resume
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
       var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -34,23 +39,23 @@ export class MessageBox extends React.Component {
           console.log('Upload is running');
           break;
       }
-    }, function(error) {
+    }, function (error) {
       // Handle unsuccessful uploads
-    }, function() {
+    }, function () {
       // Handle successful uploads on complete
       // For instance, get the download URL: https://firebasestorage.googleapis.com/...
       var downloadURL = uploadTask.snapshot.downloadURL;
       var messageRef = firebase.database().ref('groups/' + groupId);
       var newMessage = {
-        type: "image",
+        type: "image/video",
         image: downloadURL,
         userId: firebase.auth().currentUser.uid,
         time: firebase.database.ServerValue.TIMESTAMP,
       };
       messageRef.child('messages').push(newMessage);
-      
+
     });
-    this.setState({file: '', imagePreviewUrl: ''})
+    this.setState({ file: '', imagePreviewUrl: '' })
   }
 
   _handleImageChange(e) {
@@ -95,26 +100,35 @@ export class MessageBox extends React.Component {
     let { imagePreviewUrl } = this.state;
     let $imagePreview = null;
     if (imagePreviewUrl) {
-      $imagePreview = (<img src={imagePreviewUrl} height='300' width='500'/>);
+      $imagePreview = (<img src={imagePreviewUrl} height='300' width='500' />);
     } else {
       $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
     }
     return (
-      <Col xs={7}>
-        <div className="Message-box write-Message">
+      <Col xs={8}>
+        <div className>
           {/* Show image of current user, who must be logged in */}
           {/*<img className="image" src={currentUser.photoURL ? currentUser.photoURL : noUserPic} alt="user avatar" />*/}
           <h3>Messages</h3>
-          <form className="Message-input">
-            <textarea placeholder="What's Happening..." name="text" value={this.state.post} className="form-control" onChange={(e) => this.updatePost(e)}></textarea>
-
-            <div className="form-group send-Message">
-              {/* Disable if invalid post length */}
-              <Button bsStyle="info"
-                disabled={this.state.post.length === 0}
-                onClick={(e) => this.postMessage(e)} >
-                <i className="fa fa-pencil-square-o" aria-hidden="true"></i> Share
+          <ButtonGroup justified>
+            <DropdownButton noCaret title = "Write a Message" bsStyle="info">
+              <div>
+                <Well>
+                  <form>
+                    <textarea placeholder="What do you want to say?" value={this.state.post} className="form-control" onChange={(e) => this.updatePost(e)}></textarea>
+                    <div className="form-group send-Message">
+                      {/* Disable if invalid post length */}
+                      <Button bsStyle="info"
+                        disabled={this.state.post.length === 0}
+                        onClick={(e) => this.postMessage(e)} >
+                        <i className="fa fa-pencil-square-o" aria-hidden="true"></i> Share
             </Button>
+                    </div>
+                  </form>
+                </Well>
+              </div>
+            </DropdownButton>
+            <DropdownButton noCaret title="Post a Photo" bsStyle="info">
               <div className="previewComponent">
                 <form onSubmit={(e) => this._handleSubmit(e)}>
                   <input className="fileInput"
@@ -128,8 +142,9 @@ export class MessageBox extends React.Component {
                   {$imagePreview}
                 </div>
               </div>
-            </div>
-          </form>
+            </DropdownButton>
+            <DropdownButton noCaret title="View Group Details" bsStyle="info"></DropdownButton>
+          </ButtonGroup>
         </div>
       </Col>
     );
@@ -193,14 +208,14 @@ export class MessageList extends React.Component {
       var groupToUse = this.state.allMessages[this.props.groupId]
       for (var i = 0; i < groupToUse.length; i++) {
         var newMessage = <MessageItem Message={groupToUse[i]}
-          user={groupToUse[i].userId} group={this.props.groupId}/>
+          user={groupToUse[i].userId} group={this.props.groupId} />
         messageItems.push(newMessage);
       }
 
     }
 
     return (
-      <Col xs={7} s={6}>
+      <Col xs={8} s={8}>
         <div>
           {messageItems}
         </div>
@@ -288,7 +303,7 @@ class MessageItem extends React.Component {
               <span className="time"><Time value={this.props.Message.time} relative /></span>
             </div>
             {this.props.Message.image &&
-            <div className="image"><img src={this.props.Message.image} height='300' width='500'/></div>
+              <div className="image"><img src={this.props.Message.image} height='300' width='500' /></div>
             }
             {/* Show the text of the Message */}
             <div className="Message">{this.props.Message.text}</div>
@@ -327,7 +342,7 @@ class EditBar extends React.Component {
   }
 
   deleteMessage() {
-    var messageRef = firebase.database().ref('groups/' + this.props.group +'/messages');
+    var messageRef = firebase.database().ref('groups/' + this.props.group + '/messages');
     messageRef.child(this.props.message.key).remove();
     this.setState({ showModal: false });
 
