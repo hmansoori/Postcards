@@ -67,6 +67,7 @@ html, body {
   padding-top: 30px;
 }
 
+
 .btn-default {
   border: none;
   margin: auto;
@@ -109,6 +110,7 @@ button.list-group-item {
   max-width: 500px;
   width: 100%; */
 
+
   position: absolute;
   margin: auto;
   top: 0;
@@ -118,8 +120,5 @@ button.list-group-item {
   max-width: 500px;
   max-height: 300px;
   text-align: center;
-  /* width: 100px; */
-  /* height: 100px; */
-  /* background-color: #ccc; */
-  /* border-radius: 3px; */
+
 }
