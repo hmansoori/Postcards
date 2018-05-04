@@ -7,6 +7,12 @@ import * as routes from '../constants/routes';
 import SignOutButton from './SignOut';
 import logo from './images/pc_logo.png';
 
+var icon = (
+    <span class="logo">
+      <a href="/">
+        <img src="/images/pc_logo.png" class="img-responsive center-block" alt="postcards logo" /></a>
+    </span>
+  );
 
 const Navigation = () =>
   <AuthUserContext.Consumer>
@@ -26,9 +32,7 @@ const Navigation = () =>
   <Navbar inverse >
       <Navbar.Header>
         <Navbar.Brand>
-          <a href="#home">
-            <img src={logo} alt="logo" width="100px" height="100px"/>
-          </a>
+          <img src={logo} alt="logo" class="img-responsive center-block"/>
         </Navbar.Brand>
       </Navbar.Header>
       <Nav pullRight>
@@ -45,10 +49,9 @@ const NavigationNonAuth = () =>
   <Navbar>
     <Navbar.Header>
       <Navbar.Brand>
-        <a href="#home">
-          <img src={logo} alt="logo" />
-        </a>
+          <img src={logo} alt="logo" class="img-responsive center-block"/>
       </Navbar.Brand>
+
     </Navbar.Header>
     <Nav>
     <li><Link to={routes.LANDING}>Landing</Link></li>
