@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Postcards</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,900" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body style="margin: 0;">
+
+
+
+
+    <!-- CSS for animations -->
+    <style>
+        /* bouncing arrow */
+        .bounce {
+            animation: bounce 4s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+        /* fade in on scroll */
+        .bounce-up .subject {
+            opacity: 0;
+            -moz-transition: all 2s ease;
+            -webkit-transition: all 2s ease;
+            -o-transition: all 2s ease;
+            transition: all 2s ease;
+            -moz-transform: translate3d(0px, 200px, 0px);
+            -webkit-transform: translate3d(0px, 200px, 0px);
+            -o-transform: translate(0px, 200px);
+            -ms-transform: translate(0px, 200px);
+            transform: translate3d(0px, 200, 0px);
+            -webkit-backface-visibility: hidden;
+            -moz-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        .bounce-up.in-view .subject {
+            opacity: 1;
+            -moz-transform: translate3d(0px, 0px, 0px);
+            -webkit-transform: translate3d(0px, 0px, 0px);
+            -o-transform: translate(0px, 0px);
+            -ms-transform: translate(0px, 0px);
+            transform: translate3d(0px, 0px, 0px);
+        }
+        /* left and right fade in animation */
+        .animation-element-left, .animation-element-right {
+            opacity: 0;
+            position: relative;
+        }
+        .animation-element-left.slide-left {
+            opacity: 0;
+            -moz-transition: all 2ms ease;
+            -webkit-transition: all 2s ease;
+            -o-transition: all 2s ease;
+            transition: all 2s ease;
+            -moz-transform: translate3d(-100px, 0px, 0px);
+            -webkit-transform: translate3d(-100px, 0px, 0px);
+            -o-transform: translate(-100px, 0px);
+            -ms-transform: translate(-100px, 0px);
+            transform: translate(-100px, 0px);
+        }
+        .animation-element-left.slide-left.in-view, .animation-element-right.slide-right.in-view {
+            opacity: 1;
+            -moz-transform: translate3d(0px, 0px, 0px);
+            -webkit-transform: translate3d(0px, 0px, 0px);
+            -o-transform: translate(0px, 0px);
+            -ms-transform: translate(0px, 0px);
+            transform: translate3d(0px, 0px, 0px);
+        }
+        .animation-element-right.slide-right {
+            opacity: 0;
+            -moz-transition: all 2s ease;
+            -webkit-transition: all 2s ease;
+            -o-transition: all 2s ease;
+            transition: all 2s ease;
+            -moz-transform: translate3d(100px, 0px, 0px);
+            -webkit-transform: translate3d(100px, 0px, 0px);
+            -o-transform: translate(100px, 0px);
+            -ms-transform: translate(100px, 0px);
+            transform: translate(100px, 0px);
+        }
+    </style>
+    <!-- JavaScript for animations -->
+    <script>
+        // timed scroll
+        jQuery(document).ready(function($) {
+            // Select all links with hashes
+            $('a[href*="#"]')
+            // Remove links that don't actually link to anything
+            .not('[href="#"]')
+            .not('[href="#0"]')
+            .click(function(event) {
+                // On-page links
+                if (
+                location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') 
+                && 
+                location.hostname == this.hostname
+                ) {
+                // Figure out element to scroll to
+                var target = $(this.hash);
+                target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+                // Does a scroll target exist?
+                if (target.length) {
+                    // Only prevent default if animation is actually gonna happen
+                    event.preventDefault();
+                    $('html, body').animate({
+                    scrollTop: target.offset().top
+                    }, 1000, function() {
+                    // Callback after animation
+                    // Must change focus!
+                    var $target = $(target);
+                    $target.focus();
+                    if ($target.is(":focus")) { // Checking if the target was focused
+                        return false;
+                    } else {
+                        $target.attr('tabindex','-1'); // Adding tabindex for elements not focusable
+                        $target.focus(); // Set focus again
+                    };
+                    });
+                }
+                }
+            });
+        });
+
+        // animate on scroll
+        jQuery(document).ready(function($) {
+            var $animation_elements = $('.animation-element');
+            var $animation_elements_left = $('.animation-element-left');
+            var $animation_elements_right = $('.animation-element-right');
+            var $window = $(window);
+            function check_if_in_view() {
+            var window_height = $window.height();
+            var window_top_position = $window.scrollTop();
+            var window_bottom_position = (window_top_position + window_height - 100);
+            $.each($animation_elements, function() {
+                var $element = $(this);
+                var element_height = $element.outerHeight();
+                var element_top_position = $element.offset().top;
+                var element_bottom_position = (element_top_position + element_height);
+                if ((element_bottom_position >= window_top_position) &&
+                (element_top_position <= window_bottom_position)) {
+                $element.addClass('in-view');
+                }
+            });
+            $.each($animation_elements_left, function() {
+                var $element = $(this);
+                var element_height = $element.outerHeight();
+                var element_top_position = $element.offset().top;
+                var element_bottom_position = (element_top_position + element_height);
+            
+                if ((element_bottom_position >= window_top_position) &&
+                    (element_top_position <= window_bottom_position)) {
+                $element.addClass('in-view');
+                }
+            });
+            $.each($animation_elements_right, function() {
+                var $element = $(this);
+                var element_height = $element.outerHeight();
+                var element_top_position = $element.offset().top;
+                var element_bottom_position = (element_top_position + element_height);
+                if ((element_bottom_position >= window_top_position) &&
+                    (element_top_position <= window_bottom_position)) {
+                $element.addClass('in-view');
+                }
+            });
+            }
+            $window.on('scroll resize', check_if_in_view);
+            $window.trigger('scroll');
+        });
+    </script>
+
+
+
+    <!-- beginning of body section -->
+    <div style="background-color: #e5f2ff; width: 100%; padding-bottom: 200px;">
+        <div class="animation-element bounce-up">
+            <div class="subject center">
+                <div style="margin: auto; padding-top: 200px; width: 190px;">
+                    <img style="width: 100%;" src="https://doc-0g-0o-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/tt4kb9dnsgtidrvvsj124t7n18vo2666/1525399200000/01457003695661456577/*/1mdTcBYvl2hMQmGkXrUoz_EO5OGh4Cbkn">
+                </div>
+
+                <div style="margin: auto; width: 50%;">
+                    <h1 style="color: #336597;
+                    text-align: center;
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 55px;
+                    margin: 0;">
+                        POSTCARDS
+                    </h1>
+                </div>
+                <!-- arrow -->
+                <div style="margin: auto; width: 80px;">
+                    <a href="#headline">
+                        <img style="width: 100%; margin-top: 50px;" class="bounce" src="https://doc-00-0o-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/l5gbmirt28n08pfpmjie5athifpr5aqc/1525399200000/01457003695661456577/*/1CGgEapM0xilnLFo2dGCA3HQRxOXEP3x8">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- headline -->
+        <div id="headline" style="margin-top: 200px;"></div>
+        <div class="animation-element-left slide-left">
+            <div style="width: 68%; margin: auto;">
+                <h1 style="color: #99b2cc;
+                font-family: 'Roboto', sans-serif;
+                font-size: 95px;
+                margin-top: 400px;
+                margin-bottom: 100px;">
+                    A <b style="color: #336597;">zero-clutter</b> social media site that closes the <b style="color: #336597;">generation gap.</b>
+                </h1>
+            </div>
+        </div>
+
+
+
+        <!-- arrow -->
+        <div style="margin: auto; width: 80px;">
+            <a href="#about">
+                <img style="width: 100%; margin-top: 50px;" class="bounce" src="https://doc-00-0o-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/l5gbmirt28n08pfpmjie5athifpr5aqc/1525399200000/01457003695661456577/*/1CGgEapM0xilnLFo2dGCA3HQRxOXEP3x8">
+            </a>
+        </div>
+
+
+
+        <!-- about section -->
+        <div id="about" style="margin-top: 200px; margin-bottom: 400px;"></div>
+        <div style="width: 70%; margin: auto;">
+            <img style="width: 100%;" src="https://doc-08-0o-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/qb5mr1at4ppfahsng0mi68824ju1a3ku/1525377600000/01457003695661456577/*/13Qia4fW6ucaFxKoIwKhk6vHNNels62DW">
+        
+            <p style="color: #336597;
+            font-family: 'Roboto', sans-serif;
+            font-size: 25px;
+            margin-bottom: 200px;
+            text-align: center;
+            font-weight: 900;">
+                Designed with everyone in mind.
+            </p>
+
+            <p style="color: #336597;
+            font-family: 'Roboto', sans-serif;
+            font-size: 25px;
+            margin-bottom: 30px;
+            font-weight: 900;">
+                Our Story
+            </p>
+
+            <p style="color: #336597;
+            font-family: 'Roboto', sans-serif;
+            font-size: 20px;">
+                According to researchers from the University of California, San Francisco (UCSF), people 60-years-old 
+                and older who reported feeling lonely saw a <b style="font-weight: 900;">45%</b> increase in their risk for death. Isolated elders also 
+                had a <b style="font-weight: 900;">59%</b> greater risk of mental and physical decline than their more social counterparts. By closing 
+                the generation gap in social media, we can better connect at-risk individuals with social-media savvy 
+                individuals.
+            </p>
+
+            <p style="color: #336597;
+            font-family: 'Roboto', sans-serif;
+            font-size: 20px;
+            margin-top: 20px;">
+                Postcards exists to close the generation gap through the sharing of little digital postcards. It was 
+                designed with everyone in mind, but focuses on age groups that are often <b style="font-weight: 900;">left out</b> of the design process. 
+                By making a <b style="font-weight: 900;">scroll-less</b>, <b style="font-weight: 900;">zero-clutter</b> interface, Postcards has become an accessible and fun platform for 
+                friends and family to share special moments.
+            </p>
+
+
+            <div class="animation-element-left slide-left">
+                <img style="width: 100%; margin-top: 170px;" src="https://doc-0g-0o-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/t53oa2d6vh3nn2p0l8qdrlncg2nog216/1525377600000/01457003695661456577/*/1tgW3fJmkwx4U8AQv18uai-ra3D36Nrjn">
+            </div>
+            <p style="color: #99b2cc;
+            font-family: 'Roboto', sans-serif;
+            font-size: 30px;
+            text-align: center;
+            font-weight: 900;">
+                <b style="color: #336597;">Share</b> postcards with any <b style="color: #336597;">picture</b>, 
+                <b style="color: #336597;">video</b>, or <b style="color: #336597;">text</b> attached.
+            </p>
+
+
+            <div class="animation-element-left slide-left">
+                <img style="width: 100%; margin-top: 100px;" src="https://doc-10-0o-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/eo2pd3j691ncnfbmqrbdqmiv37jrp1ch/1525377600000/01457003695661456577/*/1ME0vVGfWuf1cRnIOx5Mc9hub3w91Iu7H">
+            </div>
+            <p style="color: #99b2cc;
+            font-family: 'Roboto', sans-serif;
+            font-size: 30px;
+            margin-bottom: 200px;
+            text-align: center;
+            font-weight: 900;">
+                <b style="color: #336597;">View</b> postcards with any <b style="color: #336597;">desktop</b>, 
+                <b style="color: #336597;">tablet</b>, or <b style="color: #336597;">mobile device.</b>
+            </p>
+
+
+            <div style="width: 294px; margin: auto;">
+                <a style="text-decoration: none;
+                color: #336597;
+                font-family: 'Roboto', sans-serif;
+                font-size: 34px;
+                font-weight: 900;" href="#">
+                    <p id="link">See Postcards Live</p>
+                </a>
+            </div>
+
+            <!-- styling and hover animation for postcards link -->
+            <style>
+                #link {
+                    text-align: center;
+                    border-bottom: 5px solid #336597;
+                    -moz-transition: all .2s ease;
+                    -webkit-transition: all .2s ease;
+                    -o-transition: all .2s ease;
+                    transition: all .2s ease;
+                }
+                #link:hover {
+                    border-bottom: 5px solid #e5f2ff;
+                    color: #99b2cc;
+                    -moz-transform: translate3d(0px, -10px, 0px);
+                    -webkit-transform: translate3d(0px, -10px, 0px);
+                    -o-transform: translate(0px, -10px);
+                    -ms-transform: translate(0px, -10px);
+                    transform: translate(0px, -10px);
+                }
+            </style>
+
+        </div>
+    </div>
+
+    <!-- footer section -->
+    <div style="background-color: white; width: 100%; margin-top: 100px; margin-bottom: 100px;">
+        <p style="text-align: center;
+        color: #336597;
+        font-family: 'Roboto', sans-serif;
+        font-size: 20px;
+        font-weight: 100;">Created by <b style="font-weight: 900;">Patricia Au</b>, <b style="font-weight: 900;">Brendan Powers</b>, <b style="font-weight: 900;">Hannah Mansoori</b>, and <b style="font-weight: 900;">Alexander Bonilla.</b></p>
+    </div>
+
+</body>
+
+</html>
