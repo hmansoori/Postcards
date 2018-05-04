@@ -5,6 +5,7 @@ import {Nav, Navbar, NavItem} from 'react-bootstrap'
 import AuthUserContext from './AuthUserContext';
 import * as routes from '../constants/routes';
 import SignOutButton from './SignOut';
+import {auth} from '../firebase';
 
 
 const Navigation = () =>
@@ -22,7 +23,7 @@ const Navigation = () =>
   //   <li><SignOutButton /></li>
   // </ul>
 
-  <Navbar inverse >
+  <Navbar >
       <Navbar.Header>
         <Navbar.Brand>
           <a href="#home">React-Bootstrap</a>
@@ -30,7 +31,9 @@ const Navigation = () =>
       </Navbar.Header>
       <Nav pullRight>
       <li><Link to={routes.LANDING}>Landing</Link></li>
-      <li><Link to={routes.SIGN_IN}>Sign In</Link></li>
+      {/* <li><Link to={routes.SIGN_IN}>Sign In</Link></li> */}
+      <li><Link to={routes.GROUP}>Groups</Link></li>
+      <li class="sign-out" onClick={auth.doSignOut}>Sign Out</li>
       </Nav>
     </Navbar>
 
