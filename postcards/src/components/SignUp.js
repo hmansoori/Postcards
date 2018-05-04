@@ -139,7 +139,7 @@ class SignUpForm extends Component {
 
     if (!usernameFilled) {
       return (
-        <div class="container">
+        <div class="signupForm">
           <h1>what name do you want to go by?</h1>
           <form>
             <FormGroup controlId="username">
@@ -160,7 +160,7 @@ class SignUpForm extends Component {
       );
     } else if (usernameFilled & !emailFilled){
       return (
-        <div class="container">
+        <div class="signupForm">
           <h1>hey, {this.state.username}! what email do you want to use?</h1>
           <form>
             <FormGroup controlId="username">
@@ -181,7 +181,7 @@ class SignUpForm extends Component {
       );
     } else if (usernameFilled & emailFilled & !passwordFilled){
       return (
-        <div class="container">
+        <div class="signupForm">
           <h1>set your password</h1>
           <form>
             <FormGroup controlId="password">
