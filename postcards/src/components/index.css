@@ -26,10 +26,7 @@ body {
 }
 
 .container {
-  /* float: none;
-  margin: 0 auto;
-  max-width: 500px;
-  width: 100%; */
+
 
   position: absolute;
   margin: auto;
@@ -40,8 +37,5 @@ body {
   max-width: 500px;
   max-height: 300px;
   text-align: center;
-  /* width: 100px; */
-  /* height: 100px; */
-  /* background-color: #ccc; */
-  /* border-radius: 3px; */
+
 }
