@@ -48,9 +48,11 @@ const NavigationNonAuth = () =>
   // </ul>
   <Navbar>
     <Navbar.Header>
-      <Navbar.Brand>
+      <a href="/">
+        <Navbar.Brand>
           <img src={logo} alt="logo" class="img-responsive center-block"/>
-      </Navbar.Brand>
+        </Navbar.Brand>
+      </a>
 
     </Navbar.Header>
     <Nav>
