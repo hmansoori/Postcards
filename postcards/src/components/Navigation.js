@@ -5,6 +5,7 @@ import {Nav, Navbar, NavItem} from 'react-bootstrap'
 import AuthUserContext from './AuthUserContext';
 import * as routes from '../constants/routes';
 import SignOutButton from './SignOut';
+import logo from './images/pc_logo.png';
 
 
 const Navigation = () =>
@@ -25,7 +26,9 @@ const Navigation = () =>
   <Navbar inverse >
       <Navbar.Header>
         <Navbar.Brand>
-          <a href="#home">React-Bootstrap</a>
+          <a href="#home">
+            <img src={logo} alt="logo" width="100px" height="100px"/>
+          </a>
         </Navbar.Brand>
       </Navbar.Header>
       <Nav pullRight>
@@ -42,7 +45,9 @@ const NavigationNonAuth = () =>
   <Navbar>
     <Navbar.Header>
       <Navbar.Brand>
-        <a href="#home">React-Bootstrap</a>
+        <a href="#home">
+          <img src={logo} alt="logo" />
+        </a>
       </Navbar.Brand>
     </Navbar.Header>
     <Nav>
