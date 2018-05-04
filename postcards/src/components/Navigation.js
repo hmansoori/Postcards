@@ -31,13 +31,16 @@ const Navigation = () =>
 
   <Navbar inverse >
       <Navbar.Header>
+      <a href="/">
         <Navbar.Brand>
           <img src={logo} alt="logo" class="img-responsive center-block"/>
         </Navbar.Brand>
+      </a>
       </Navbar.Header>
       <Nav pullRight>
-      <li><Link to={routes.LANDING}>Landing</Link></li>
-      <li><Link to={routes.SIGN_IN}>Sign In</Link></li>
+        <li><Link to={routes.GROUP}>Groups</Link></li>
+        <li><Link to={routes.ACCOUNT}>Account</Link></li>
+        <li><SignOutButton /></li>
       </Nav>
     </Navbar>
 
@@ -54,10 +57,11 @@ const NavigationNonAuth = () =>
         </Navbar.Brand>
       </a>
 
+
     </Navbar.Header>
-    <Nav>
-    <li><Link to={routes.LANDING}>Landing</Link></li>
-    <li><Link to={routes.SIGN_IN}>Sign In</Link></li>
+    <Nav pullRight>
+      <li><Link to={routes.LANDING}>Landing</Link></li>
+      <li><Link to={routes.SIGN_IN}>Sign In</Link></li>
     </Nav>
   </Navbar>
 
