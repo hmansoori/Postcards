@@ -13,6 +13,7 @@ class GroupLinks extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.joinGroup = this.joinGroup.bind(this);
     this.createNewGroup = this.createNewGroup.bind(this);
+
   }
 
   //Pull all groups that the current user is associated with from firebase.
@@ -88,10 +89,12 @@ class GroupLinks extends React.Component {
   //Changes the groupID in state when the user clicks on a group in the list.
   //This new state is then passed to the messageBox and messageList components.
   handleClick(event) {
-    var thisComponent = this;
     var id = event.target.id;
-    this.setState({ groupId: id });
+    var name = event.target.name;
+    this.setState({ groupId: id , groupName: name});
   }
+
+
 
   render() {
     if (this.state.group) {
@@ -99,13 +102,12 @@ class GroupLinks extends React.Component {
       var groups = [];
       //Populates list with names of available groups.
       for (var obj in this.state.group) {
-        var groupId = this.state.group[obj].groupName;
-        var newItem = <ListGroupItem onClick={this.handleClick} id={obj}>{this.state.group[obj].groupName}</ListGroupItem>
+        var newItem = <ListGroupItem onClick={this.handleClick} id={obj} name={this.state.group[obj].groupName}>{this.state.group[obj].groupName}</ListGroupItem>
         groups.push(newItem);
       }
       return (
         <div>
-          <Col xs={4} s={2} m={2} className="Group-nav">
+          <Col xs={2} className="Group-nav">
             <h3>Your Groups</h3>
             <ListGroup className="list-unstyled">
               {groups}
@@ -145,11 +147,13 @@ class GroupLinks extends React.Component {
               </ListGroupItem>
             </ListGroup>
           </Col>
-          <Col xs={8} className="message-section">
+          <Col xs={10} className="message-section">
+          
 
         {/*render components to create new messages and display existing messages*/}
-            <MessageBox groupId={this.state.groupId} />
-            <MessageList groupId={this.state.groupId} />
+            
+            <MessageList groupId={this.state.groupId} name={this.state.groupName} />
+            {/* <MessageBox groupId={this.state.groupId} /> */}
 
           </Col>
         </div>

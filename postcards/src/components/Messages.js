@@ -4,14 +4,16 @@ import firebase from 'firebase'
 
 //import noUserPic from './no-user-pic.png';
 
-import { Col, Collapse, Well, Modal, Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
+import {Image, Row, Col, Collapse, Well, Modal, Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
+import { isNullOrUndefined } from 'util';
 
 // A form the user can use to post a Message
 export class MessageBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = { post: '', file: '', imagePreviewUrl: '' };
-    this._handleSubmit = this._handleSubmit.bind(this);
+    this._handleSubmitImage = this._handleSubmitImage.bind(this);
+    this._handleSubmitVideo = this._handleSubmitVideo.bind(this);
     this.updatePost = this.updatePost.bind(this);
   }
 
@@ -19,8 +21,45 @@ export class MessageBox extends React.Component {
     this.setState({ textUpdate: event.target.value });
   }
 
+  _handleSubmitVideo(e) {
+    e.preventDefault();
+    // TODO: do something with -> this.state.file
+    var storageRef = firebase.storage().ref('/videos').child(this.state.file.name);
+    var uploadTask = storageRef.put(this.state.file);
+    var groupId = this.props.groupId;
+    uploadTask.on('state_changed', function (snapshot) {
+      // Observe state change events such as progress, pause, and resume
+      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case firebase.storage.TaskState.PAUSED: // or 'paused'
+          console.log('Upload is paused');
+          break;
+        case firebase.storage.TaskState.RUNNING: // or 'running'
+          console.log('Upload is running');
+          break;
+      }
+    }, function (error) {
+      // Handle unsuccessful uploads
+    }, function () {
+      // Handle successful uploads on complete
+      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+      var downloadURL = uploadTask.snapshot.downloadURL;
+      var messageRef = firebase.database().ref('groups/' + groupId);
+      var newMessage = {
+        type: "video",
+        video: downloadURL,
+        userId: firebase.auth().currentUser.uid,
+        time: firebase.database.ServerValue.TIMESTAMP,
+      };
+      messageRef.child('messages').push(newMessage);
 
-  _handleSubmit(e) {
+    });
+    this.setState({ file: '', imagePreviewUrl: '' })
+  }
+
+  _handleSubmitImage(e) {
     e.preventDefault();
     // TODO: do something with -> this.state.file
     var storageRef = firebase.storage().ref('/images').child(this.state.file.name);
@@ -47,7 +86,7 @@ export class MessageBox extends React.Component {
       var downloadURL = uploadTask.snapshot.downloadURL;
       var messageRef = firebase.database().ref('groups/' + groupId);
       var newMessage = {
-        type: "image/video",
+        type: "image",
         image: downloadURL,
         userId: firebase.auth().currentUser.uid,
         time: firebase.database.ServerValue.TIMESTAMP,
@@ -105,48 +144,65 @@ export class MessageBox extends React.Component {
       $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
     }
     return (
-      <Col xs={8}>
-        <div className>
+      
+        <div>
           {/* Show image of current user, who must be logged in */}
           {/*<img className="image" src={currentUser.photoURL ? currentUser.photoURL : noUserPic} alt="user avatar" />*/}
-          <h3>Messages</h3>
-          <ButtonGroup justified>
-            <DropdownButton noCaret title = "Write a Message" bsStyle="info">
-              <div>
-                <Well>
-                  <form>
-                    <textarea placeholder="What do you want to say?" value={this.state.post} className="form-control" onChange={(e) => this.updatePost(e)}></textarea>
-                    <div className="form-group send-Message">
-                      {/* Disable if invalid post length */}
-                      <Button bsStyle="info"
-                        disabled={this.state.post.length === 0}
-                        onClick={(e) => this.postMessage(e)} >
-                        <i className="fa fa-pencil-square-o" aria-hidden="true"></i> Share
+          <div className="message-buttons">
+            <div>
+              <DropdownButton class="choice-button" dropup noCaret title="Write a Message" >
+                <div>
+                  <Well>
+                    <form onSelect = {(e) => e.stopPropagation()}>
+                      <textarea placeholder="What do you want to say?" value={this.state.post} className="form-control" onChange={(e) => this.updatePost(e)}></textarea>
+                      <div className="form-group send-Message">
+                        {/* Disable if invalid post length */}
+                        <Button bsStyle="info"
+                          disabled={this.state.post.length === 0}
+                          onClick={(e) => this.postMessage(e)} >
+                          <i className="fa fa-pencil-square-o" aria-hidden="true"></i> Share
             </Button>
-                    </div>
-                  </form>
-                </Well>
-              </div>
-            </DropdownButton>
-            <DropdownButton noCaret title="Post a Photo" bsStyle="info">
-              <div className="previewComponent">
-                <form onSubmit={(e) => this._handleSubmit(e)}>
-                  <input className="fileInput"
-                    type="file"
-                    onChange={(e) => this._handleImageChange(e)} />
-                  <button className="submitButton"
-                    type="submit"
-                    onClick={(e) => this._handleSubmit(e)}>Upload Image</button>
-                </form>
-                <div className="imgPreview">
-                  {$imagePreview}
+                      </div>
+                    </form>
+                  </Well>
                 </div>
-              </div>
-            </DropdownButton>
-            <DropdownButton noCaret title="View Group Details" bsStyle="info"></DropdownButton>
-          </ButtonGroup>
+              </DropdownButton>
+              <DropdownButton dropup noCaret title="Post a Photo" class="choice-button">
+                <div className="previewComponent">
+                  <form onSubmit={(e) => this._handleSubmit(e)}>
+                    <input className="fileInput"
+                      type="file"
+                      onSelect = {(e) => e.stopPropagation()}
+                      onChange={(e) => this._handleImageChange(e)} />
+                    <button className="submitButton"
+                      type="submit"
+                      onClick={(e) => this._handleSubmitImage(e)}>Upload Image</button>
+                  </form>
+                  <div className="imgPreview">
+                    {$imagePreview}
+                  </div>
+                </div>
+              </DropdownButton>
+              <DropdownButton dropup noCaret title="Share a Video" class="choice-button">
+              <div className="previewComponent">
+                  <form onSubmit={(e) => this._handleSubmitVideo(e)}>
+                    <input className="fileInput"
+                      type="file"
+                      onSelect = {(e) => e.stopPropagation()}
+                      onChange={(e) => this._handleImageChange(e)} />
+                    <button className="submitButton"
+                      type="submit"
+                      onClick={(e) => this._handleSubmitVideo(e)}>Upload An .mp4 File</button>
+                  </form>
+                  <div className="imgPreview">
+                    {$imagePreview}
+                  </div>
+                </div>
+              </DropdownButton>
+            </div>
+          </div>
         </div>
-      </Col>
+      
     );
   }
 }
@@ -155,7 +211,10 @@ export class MessageBox extends React.Component {
 export class MessageList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { Messages: [] };
+    this.state = { Messages: [], index: 0 , maxLength: 1};
+    this.raiseIndex = this.raiseIndex.bind(this);
+    this.lowerIndex = this.lowerIndex.bind(this);
+    this.resetIndex = this.resetIndex.bind(this);
   }
 
   //Lifecycle callback executed when the component appears on the screen.
@@ -172,7 +231,6 @@ export class MessageList extends React.Component {
       this.setState({ users: snapshot.val() });
     });
     var groupObject = {};
-    var messageArray = [];
     var groupRef = firebase.database().ref('groups');
     groupRef.on('value', (snapshot) => {
       this.setState({ groups: snapshot.val() });
@@ -186,11 +244,28 @@ export class MessageList extends React.Component {
         groupMessages.sort((a, b) => b.time - a.time);
         groupObject[group.key] = groupMessages;
       })
-      this.setState({ allMessages: groupObject })
+      this.setState({ allMessages: groupObject });
 
     })
 
 
+  }
+
+  lowerIndex(event) {
+    event.preventDefault();
+    this.setState({index: (this.state.index -1)})
+    
+  }
+
+  raiseIndex(event) {
+    event.preventDefault();
+    this.setState({index: (this.state.index + 1)})
+    
+  }
+
+  resetIndex(event) {
+    event.preventDefault();
+    this.setState({index: 0});
   }
 
   //When component will be removed
@@ -211,15 +286,42 @@ export class MessageList extends React.Component {
           user={groupToUse[i].userId} group={this.props.groupId} />
         messageItems.push(newMessage);
       }
-
     }
-
+    
     return (
-      <Col xs={8} s={8}>
+      
+      <div>
+      {this.props.groupId != undefined &&
+      <div>
+      
+      <Row>
+      <Col xs={10} class="message-section">
+      <div className="group-header">{this.props.groupName}</div>
+          {messageItems[this.state.index]}
+      </Col>
+ 
+
+      <Col xs={2} className="arrow-container">
         <div>
-          {messageItems}
+          <button className="arrow" disabled={this.state.index === 0} onClick={this.lowerIndex}><i class="fas fa-chevron-up fa-5x" ></i></button>
+        </div>
+        <div>
+          <button className="arrow" disabled={this.state.index === (messageItems.length -1)} onClick={this.raiseIndex}><i class="fas fa-chevron-down fa-5x"></i></button>
+        </div>
+        <div>
+          <button className="refresh" onClick={this.resetIndex}><i class="fas fa-sync-alt fa-5x"></i></button>
         </div>
       </Col>
+      </Row>
+      <Row>
+      <Col xs={6} xsOffset={1}>
+      <MessageBox groupId = {this.props.groupId} />
+      </Col>
+      </Row>
+      </div>
+      }
+      </div>
+
     );
   }
 }
@@ -289,35 +391,42 @@ class MessageItem extends React.Component {
 
     return (
 
-      <div className="Message-box">
+      <div>
         {this.state && this.state.user &&
-          <div>
-            <div>
-              {/* This image's src should be the user's avatar */}
-              {/* <img className="image" src={avatar} role="presentation" /> */}
+          <div className="message-card">
+            <div className="message-content">
+              <div>
+                {/* Show the time of the Message (use a Time component!) */}
+                <span className="time"><Time value={this.props.Message.time} relative /></span>
+                {/* This image's src should be the user's avatar */}
+                {/* <img className="image" src={avatar} role="presentation" /> */}
 
-              {/* Show the user's handle */}
-              <span className="handle">{user.username} {/*space*/}</span>
+                {/* Show the user's handle */}
 
-              {/* Show the time of the Message (use a Time component!) */}
-              <span className="time"><Time value={this.props.Message.time} relative /></span>
-            </div>
-            {this.props.Message.image &&
-              <div className="image"><img src={this.props.Message.image} height='300' width='500' /></div>
-            }
-            {/* Show the text of the Message */}
-            <div className="Message">{this.props.Message.text}</div>
 
-            {/* Create a section for showing Message likes */}
-            <div className="likes">
 
-              {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
-              <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
+              </div>
+              {this.props.Message.image &&
+                <div className="image"><Image src={this.props.Message.image} responsive /></div>
+              }
+              {this.props.Message.video &&
+                <div className="video"><video id="my-video" class="video-js" controls preload="auto" width="500" height="300" data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
+              }
+              {/* Show the text of the Message */}
+              <div className="Message">{this.props.Message.text}</div>
+              <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
 
-              {/* Show the total number of likes */}
-              <span>{/*space*/} {likeCount}</span>
-            </div>
-            <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
+              {/* Create a section for showing Message likes */}
+              <div className="likes">
+
+                {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
+                <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
+
+                {/* Show the total number of likes */}
+                <span>{/*space*/} {likeCount}</span>
+              </div>
+              <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
+              </div>
             </div>
           </div>
         }

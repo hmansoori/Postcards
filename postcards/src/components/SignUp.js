@@ -17,11 +17,6 @@ const SignUpPage = ({ history }) =>
   </div>
 
 const INITIAL_STATE = {
-  // username: '',
-  // email: '',
-  // passwordOne: '',
-  // passwordTwo: '',
-  // error: null,
 
   username: "",
   email: "",
@@ -41,10 +36,49 @@ class SignUpForm extends Component {
   constructor(props) {
     super(props);
     this.state = { ...INITIAL_STATE };
+    this.handleValidPassword = this.handleValidPassword.bind(this);
+    this.handlePasswordMatch = this.handlePasswordMatch.bind(this);
+    this.handleValidEmail = this.handleValidEmail.bind(this);
+
   }
 
   handleChange(event) {
     this.setState({username: "event.target.value"});
+  }
+
+  handleValidPassword(event) {
+    var input = event.target.value;
+    this.setState({password: input});
+    if (input.length < 5) {
+      this.setState({validPassword: "error"});
+    } else {
+      this.setState({validPassword: "success"});
+      this.setState(byPropKey('password', input));
+    }
+  }
+
+  handlePasswordMatch(event) {
+    var input = event.target.value;
+    this.setState({passwordCheck: input});
+    if (input !== this.state.password) {
+      this.setState({validMatch: "error"});
+    } else {
+      this.setState({validMatch: "success"});
+      this.setState(byPropKey('passwordCheck', event.target.value));
+    }
+
+  }
+
+  handleValidEmail(event) {
+    var input = event.target.value;
+    this.setState({email: input});
+    var valid = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(input);
+    if (!valid) {
+      this.setState({validEmail: "error"});
+    } else {
+      this.setState({validEmail: "success"});
+      this.setState(byPropKey('email', event.target.value));
+    }
   }
 
   handleClick(button) {
@@ -78,12 +112,6 @@ class SignUpForm extends Component {
   }
 
   onSubmit = (event) => {
-    // const {
-    //   username,
-    //   email,
-    //   passwordOne,
-    // } = this.state;
-    //
     const {
       history,
     } = this.props;
@@ -158,18 +186,18 @@ class SignUpForm extends Component {
           </form>
         </div>
       );
-    } else if (usernameFilled & !emailFilled){
+    } else if (usernameFilled & !emailFilled) {
       return (
         <div class="container">
           <h1>hey, {this.state.username}! what email do you want to use?</h1>
           <form>
-            <FormGroup controlId="username">
+            <FormGroup controlId="username" validationState={this.state.validEmail}>
               <FormControl
                   type="text"
                   value={this.state.email}
                   placeholder="Enter your email here"
                   /*onChange={this.handleChange}*/
-                onChange={event => this.setState(byPropKey('email', event.target.value))}
+                onChange={(e) => this.handleValidEmail(e)}
               />
               <FormControl.Feedback />
             </FormGroup>
@@ -184,21 +212,24 @@ class SignUpForm extends Component {
         <div class="container">
           <h1>set your password</h1>
           <form>
-            <FormGroup controlId="password">
+            <FormGroup controlId="password" validationState={this.state.validPassword}>
               <FormControl
                   type="password"
                   value={this.state.password}
                   placeholder="Enter your password here"
-                onChange={event => this.setState(byPropKey('password', event.target.value))}
+                // onChange={event => this.setState(byPropKey('password', event.target.value))}
+                onChange={(e) => this.handleValidPassword(e)}
               />
               <FormControl.Feedback />
             </FormGroup>
-            <FormGroup controlId="passwordCheck">
+            <FormGroup controlId="passwordCheck" validationState={this.state.validMatch}>
               <FormControl
                   type="password"
                   value={this.state.passwordCheck}
                   placeholder="Retype your password here"
-                onChange={event => this.setState(byPropKey('passwordCheck', event.target.value))}
+                // onChange={event => this.setState(byPropKey('passwordCheck', event.target.value))}
+                onChange={(e) => this.handlePasswordMatch(e)}
+               
               />
               <FormControl.Feedback />
             </FormGroup>
