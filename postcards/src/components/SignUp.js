@@ -22,9 +22,11 @@ const INITIAL_STATE = {
   email: "",
   password: "",
   passwordCheck: "",
+  image: "",
   usernameFilled: false,
   emailFilled: false,
-  passwordFilled: false
+  passwordFilled: false,
+  imageFilled: false
 };
 
 const byPropKey = (propertyName, value) => () => ({
@@ -149,10 +151,12 @@ class SignUpForm extends Component {
     const email = this.state.email;
     const password = this.state.password;
     const passwordCheck = this.state.passwordCheck;
+    const image = this.state.image;
 
     const usernameFilled = this.state.usernameFilled;
     const emailFilled = this.state.emailFilled;
     const passwordFilled = this.state.passwordFilled;
+    const imageFilled = this.state.imageFilled;
 
     const nameIsInvalid =
       username === '';
@@ -163,7 +167,6 @@ class SignUpForm extends Component {
     const passwordIsInvalid =
       password !== passwordCheck ||
       password === '';
-
 
     if (!usernameFilled) {
       return (
@@ -229,7 +232,7 @@ class SignUpForm extends Component {
                   placeholder="Retype your password here"
                 // onChange={event => this.setState(byPropKey('passwordCheck', event.target.value))}
                 onChange={(e) => this.handlePasswordMatch(e)}
-               
+
               />
               <FormControl.Feedback />
             </FormGroup>
@@ -239,6 +242,17 @@ class SignUpForm extends Component {
           </form>
         </div>
       );
+    } else if (usernameFilled & emailFilled & passwordFilled & !imageFilled) {
+      // TODO: UPDATE IMAGE STATE TO DEFAULT VALUE
+      return (
+        <div>
+          // TODO: CONTENT
+          <Button bsStyle="primary" disabled={passwordIsInvalid}
+            onClick={() => this.handleClick('imageFilled')}>
+            {this.state.imageFilled}
+          </Button>
+        </div>
+      )
     } else {
       return (
         <div><Button bsStyle="primary" onClick={this.onSubmit}>
