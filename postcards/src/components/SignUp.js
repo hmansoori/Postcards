@@ -100,6 +100,10 @@ class SignUpForm extends Component {
       this.setState(byPropKey => ({
         'passwordFilled': !this.state.passwordFilled,
       }));
+    } else if (button == 'imageFilled') {
+      this.setState(byPropKey => ({
+        'imageFilled': this.state.imageFilled,
+      }));
     }
   }
 
@@ -243,13 +247,13 @@ class SignUpForm extends Component {
         </div>
       );
     } else if (usernameFilled & emailFilled & passwordFilled & !imageFilled) {
-      // TODO: UPDATE IMAGE STATE TO DEFAULT VALUE
+      // TODO: UPDATE IMAGE STATE TO DEFAULT VALUE AND THEN CHANGE TO USER'S PIC ONCLICK
       return (
         <div>
           // TODO: CONTENT
           <Button bsStyle="primary" disabled={passwordIsInvalid}
             onClick={() => this.handleClick('imageFilled')}>
-            {this.state.imageFilled}
+            Continue
           </Button>
         </div>
       )
