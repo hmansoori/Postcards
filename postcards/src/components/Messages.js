@@ -1,6 +1,8 @@
 import React from 'react';
 import Time from 'react-time'
 import firebase from 'firebase'
+import {Box, Card} from './CardAnimation.js'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 //import noUserPic from './no-user-pic.png';
 
@@ -144,7 +146,7 @@ export class MessageBox extends React.Component {
       $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
     }
     return (
-      
+
         <div>
           {/* Show image of current user, who must be logged in */}
           {/*<img className="image" src={currentUser.photoURL ? currentUser.photoURL : noUserPic} alt="user avatar" />*/}
@@ -202,7 +204,7 @@ export class MessageBox extends React.Component {
             </div>
           </div>
         </div>
-      
+
     );
   }
 }
@@ -211,7 +213,10 @@ export class MessageBox extends React.Component {
 export class MessageList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { Messages: [], index: 0 , maxLength: 1};
+    this.state = { Messages: [],
+                   index: 0,
+                   maxLength: 1
+                 };
     this.raiseIndex = this.raiseIndex.bind(this);
     this.lowerIndex = this.lowerIndex.bind(this);
     this.resetIndex = this.resetIndex.bind(this);
@@ -254,13 +259,13 @@ export class MessageList extends React.Component {
   lowerIndex(event) {
     event.preventDefault();
     this.setState({index: (this.state.index -1)})
-    
+
   }
 
   raiseIndex(event) {
     event.preventDefault();
     this.setState({index: (this.state.index + 1)})
-    
+
   }
 
   resetIndex(event) {
@@ -287,19 +292,19 @@ export class MessageList extends React.Component {
         messageItems.push(newMessage);
       }
     }
-    
+
     return (
-      
+
       <div>
       {this.props.groupId != undefined &&
       <div>
-      
+
       <Row>
       <Col xs={10} class="message-section">
       <div className="group-header">{this.props.groupName}</div>
           {messageItems[this.state.index]}
       </Col>
- 
+
 
       <Col xs={2} className="arrow-container">
         <div>
@@ -330,7 +335,11 @@ export class MessageList extends React.Component {
 class MessageItem extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { textUpdate: '' }
+    this.state = { textUpdate: '',
+                   leftCard: "leftValue",
+                   rightCard: "rightValue",
+                   cardArray: [1, 2, 3]
+                 }
     this.componentWillMount = this.componentWillMount.bind(this);
   }
 
@@ -376,6 +385,21 @@ class MessageItem extends React.Component {
     MessageLikes.set(likeObj) //update the likes!
   }
 
+  // Creates individual "cards" that are mapped to a key (TODO: key -> message)
+  // Called in return in render()
+  createCards() {
+    //console.log(this.state.cardArray)
+    return this.state.cardArray.map((item, i) => {
+			return (
+				<Box key={item}
+          onClick={() => console.log("called createCards()")}
+          className="item">
+					{item}
+				</Box>
+			);
+		});
+  }
+
   render() {
     //like styling, for fun!
     var iLike = false;
@@ -396,6 +420,12 @@ class MessageItem extends React.Component {
           <div className="message-card">
             <div className="message-content">
               <div>
+                <ReactCSSTransitionGroup
+                  transitionName="example"
+                  transitionEnterTimeout={500}
+                  transitionLeaveTimeout={300}>
+                  {this.createCards()}
+                </ReactCSSTransitionGroup>
                 {/* Show the time of the Message (use a Time component!) */}
                 <span className="time"><Time value={this.props.Message.time} relative /></span>
                 {/* This image's src should be the user's avatar */}
