@@ -7,6 +7,7 @@ import { auth, db } from '../firebase';
 import * as routes from '../constants/routes';
 import { Button, FormGroup, FormControl } from 'react-bootstrap';
 import { Col } from 'react-bootstrap';
+import firebase from 'firebase';
 
 
 
@@ -45,27 +46,27 @@ class SignUpForm extends Component {
   }
 
   handleChange(event) {
-    this.setState({username: "event.target.value"});
+    this.setState({ username: "event.target.value" });
   }
 
   handleValidPassword(event) {
     var input = event.target.value;
-    this.setState({password: input});
+    this.setState({ password: input });
     if (input.length < 5) {
-      this.setState({validPassword: "error"});
+      this.setState({ validPassword: "error" });
     } else {
-      this.setState({validPassword: "success"});
+      this.setState({ validPassword: "success" });
       this.setState(byPropKey('password', input));
     }
   }
 
   handlePasswordMatch(event) {
     var input = event.target.value;
-    this.setState({passwordCheck: input});
+    this.setState({ passwordCheck: input });
     if (input !== this.state.password) {
-      this.setState({validMatch: "error"});
+      this.setState({ validMatch: "error" });
     } else {
-      this.setState({validMatch: "success"});
+      this.setState({ validMatch: "success" });
       this.setState(byPropKey('passwordCheck', event.target.value));
     }
 
@@ -73,14 +74,73 @@ class SignUpForm extends Component {
 
   handleValidEmail(event) {
     var input = event.target.value;
-    this.setState({email: input});
+    this.setState({ email: input });
     var valid = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(input);
     if (!valid) {
-      this.setState({validEmail: "error"});
+      this.setState({ validEmail: "error" });
     } else {
-      this.setState({validEmail: "success"});
+      this.setState({ validEmail: "success" });
       this.setState(byPropKey('email', event.target.value));
     }
+  }
+
+  _handleImageChange(e) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+    reader.onloadend = () => {
+      this.setState({
+        file: file,
+        imagePreviewUrl: reader.result
+      });
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+  _handleSubmitImage(newUser, email, username) {
+    // e.preventDefault();
+    // TODO: do something with -> this.state.file
+    const {
+      history,
+    } = this.props;
+    var storageRef = firebase.storage().ref('/avatars').child(this.state.file.name);
+    var uploadTask = storageRef.put(this.state.file);
+    uploadTask.on('state_changed', function (snapshot) {
+      // Observe state change events such as progress, pause, and resume
+      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case firebase.storage.TaskState.PAUSED: // or 'paused'
+          console.log('Upload is paused');
+          break;
+        case firebase.storage.TaskState.RUNNING: // or 'running'
+          console.log('Upload is running');
+          break;
+      }
+    }, function (error) {
+      // Handle unsuccessful uploads
+      console.log(error);
+    }, function () {
+      // Handle successful uploads on complete
+      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+      var downloadURL = uploadTask.snapshot.downloadURL;
+      db.doCreateUser(newUser.uid, username, email, downloadURL)
+          .then(() => {
+            console.log('kept going');
+            //this.setState(() => ({ ...INITIAL_STATE }));
+            history.push(routes.GROUP);
+            
+          })
+          .catch(error => {
+            //this.setState(byPropKey('error', error));
+            console.log('here');
+          });
+
+    });
+    this.setState({ file: '', imagePreviewUrl: '' })
   }
 
   handleClick(button) {
@@ -101,9 +161,11 @@ class SignUpForm extends Component {
         'passwordFilled': !this.state.passwordFilled,
       }));
     } else if (button == 'imageFilled') {
+      console.log('clicked');
       this.setState(byPropKey => ({
-        'imageFilled': this.state.imageFilled,
+        'imageFilled': !this.state.imageFilled,
       }));
+      console.log(this.state.imageFilled)
     }
   }
 
@@ -118,6 +180,7 @@ class SignUpForm extends Component {
   }
 
   onSubmit = (event) => {
+    event.preventDefault();
     const {
       history,
     } = this.props;
@@ -128,29 +191,25 @@ class SignUpForm extends Component {
     } = this.state;
     auth.doCreateUserWithEmailAndPassword(email, password)
       .then(authUser => {
-
-          // Create a user in your own accessible Firebase Database too
-          db.doCreateUser(authUser.uid, username, email)
-          .then(() => {
-            this.setState(() => ({ ...INITIAL_STATE }));
-            history.push(routes.GROUP);
-          })
-          .catch(error => {
-            this.setState(byPropKey('error', error));
-            console.log('here');
-          });
-
-        })
+        this._handleSubmitImage(authUser, email, username)
+        // Create a user in your own accessible Firebase Database too
+        //console.log('made it here');
+      })
       .catch(error => {
         this.setState(byPropKey('error', error));
-        console.log('here2');
+        console.log(error);
       });
-
-    event.preventDefault();
 
   }
 
   render() {
+    let { imagePreviewUrl } = this.state;
+    let $imagePreview = null;
+    if (imagePreviewUrl) {
+      $imagePreview = (<img src={imagePreviewUrl} height='300' width='300' />);
+    } else {
+      $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
+    }
     const username = this.state.username;
     const email = this.state.email;
     const password = this.state.password;
@@ -179,10 +238,10 @@ class SignUpForm extends Component {
           <form>
             <FormGroup controlId="username">
               <FormControl
-                  type="text"
-                  value={this.state.username}
-                  placeholder="Enter your name here"
-                  /*onChange={this.handleChange}*/
+                type="text"
+                value={this.state.username}
+                placeholder="Enter your name here"
+                /*onChange={this.handleChange}*/
                 onChange={event => this.setState(byPropKey('username', event.target.value))}
               />
               <FormControl.Feedback />
@@ -200,10 +259,10 @@ class SignUpForm extends Component {
           <form>
             <FormGroup controlId="username" validationState={this.state.validEmail}>
               <FormControl
-                  type="text"
-                  value={this.state.email}
-                  placeholder="Enter your email here"
-                  /*onChange={this.handleChange}*/
+                type="text"
+                value={this.state.email}
+                placeholder="Enter your email here"
+                /*onChange={this.handleChange}*/
                 onChange={(e) => this.handleValidEmail(e)}
               />
               <FormControl.Feedback />
@@ -214,16 +273,16 @@ class SignUpForm extends Component {
           </form>
         </div>
       );
-    } else if (usernameFilled & emailFilled & !passwordFilled){
+    } else if (usernameFilled & emailFilled & !passwordFilled) {
       return (
         <div class="signupForm">
           <h1>set your password</h1>
           <form>
             <FormGroup controlId="password" validationState={this.state.validPassword}>
               <FormControl
-                  type="password"
-                  value={this.state.password}
-                  placeholder="Enter your password here"
+                type="password"
+                value={this.state.password}
+                placeholder="Enter your password here"
                 // onChange={event => this.setState(byPropKey('password', event.target.value))}
                 onChange={(e) => this.handleValidPassword(e)}
               />
@@ -231,9 +290,9 @@ class SignUpForm extends Component {
             </FormGroup>
             <FormGroup controlId="passwordCheck" validationState={this.state.validMatch}>
               <FormControl
-                  type="password"
-                  value={this.state.passwordCheck}
-                  placeholder="Retype your password here"
+                type="password"
+                value={this.state.passwordCheck}
+                placeholder="Retype your password here"
                 // onChange={event => this.setState(byPropKey('passwordCheck', event.target.value))}
                 onChange={(e) => this.handlePasswordMatch(e)}
 
@@ -250,8 +309,21 @@ class SignUpForm extends Component {
       // TODO: UPDATE IMAGE STATE TO DEFAULT VALUE AND THEN CHANGE TO USER'S PIC ONCLICK
       return (
         <div>
-          // TODO: CONTENT
-          <Button bsStyle="primary" disabled={passwordIsInvalid}
+          <div className="previewComponent">
+            <form onSubmit={(e) => this._handleSubmit(e)} onSelect={(e) => e.stopPropagation()}>
+              <input className="fileInput"
+                type="file"
+                onSelect={(e) => e.stopPropagation()}
+                onChange={(e) => this._handleImageChange(e)} />
+              {/* <button className="submitButton"
+                type="submit"
+                onClick={(e) => this._handleSubmitImage(e)}>Upload Image</button> */}
+            </form>
+            <div className="imgPreview">
+              {$imagePreview}
+            </div>
+          </div>
+          <Button bsStyle="primary" 
             onClick={() => this.handleClick('imageFilled')}>
             Continue
           </Button>
