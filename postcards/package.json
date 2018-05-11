@@ -9,16 +9,18 @@
     "moment": "^2.22.0",
     "momentjs": "^2.0.0",
     "npm": "^6.0.0",
-    "react": "^16.3.0",
+    "react": "^16.3.2",
+    "react-addons-css-transition-group": "^15.6.2",
     "react-bootstrap": "^0.32.1",
-    "react-dom": "^16.3.0",
+    "react-dom": "^16.3.2",
     "react-flip-move": "^3.0.1",
     "react-image-upload": "0.0.1",
     "react-images-upload": "^1.0.6",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.1",
-    "react-time": "^4.3.0"
+    "react-time": "^4.3.0",
+    "styled-components": "^3.2.6"
   },
   "scripts": {
     "start": "react-scripts start",
