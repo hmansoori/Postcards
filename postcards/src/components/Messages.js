@@ -2,11 +2,7 @@ import React from 'react';
 import Time from 'react-time'
 import firebase from 'firebase'
 import {Box, Card} from './CardAnimation.js'
-<<<<<<< HEAD
-//import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-=======
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
->>>>>>> 98bc113181ca7ea3f999129a36c819fd82e5ec64
 
 //import noUserPic from './no-user-pic.png';
 
@@ -424,20 +420,12 @@ class MessageItem extends React.Component {
           <div className="message-card">
             <div className="message-content">
               <div>
-<<<<<<< HEAD
-                {/* <ReactCSSTransitionGroup
-=======
                 <ReactCSSTransitionGroup
->>>>>>> 98bc113181ca7ea3f999129a36c819fd82e5ec64
                   transitionName="example"
                   transitionEnterTimeout={500}
                   transitionLeaveTimeout={300}>
                   {this.createCards()}
-<<<<<<< HEAD
-                </ReactCSSTransitionGroup> */}
-=======
                 </ReactCSSTransitionGroup>
->>>>>>> 98bc113181ca7ea3f999129a36c819fd82e5ec64
                 {/* Show the time of the Message (use a Time component!) */}
                 <span className="time"><Time value={this.props.Message.time} relative /></span>
                 {/* This image's src should be the user's avatar */}
