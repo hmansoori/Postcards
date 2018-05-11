@@ -13,7 +13,7 @@ import { isNullOrUndefined } from 'util';
 export class MessageBox extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { post: '', file: '', imagePreviewUrl: '' };
+    this.state = { post: '', file: '', imagePreviewUrl: '', photoCaption: '', videoCaption: '' };
     this._handleSubmitImage = this._handleSubmitImage.bind(this);
     this._handleSubmitVideo = this._handleSubmitVideo.bind(this);
     this.updatePost = this.updatePost.bind(this);
@@ -49,16 +49,18 @@ export class MessageBox extends React.Component {
       // For instance, get the download URL: https://firebasestorage.googleapis.com/...
       var downloadURL = uploadTask.snapshot.downloadURL;
       var messageRef = firebase.database().ref('groups/' + groupId);
+      var cap = this.state.videoCaption;
       var newMessage = {
         type: "video",
         video: downloadURL,
         userId: firebase.auth().currentUser.uid,
         time: firebase.database.ServerValue.TIMESTAMP,
+        caption: cap
       };
       messageRef.child('messages').push(newMessage);
 
     });
-    this.setState({ file: '', imagePreviewUrl: '' })
+    this.setState({ file: '', imagePreviewUrl: '', videoCaption: ''})
   }
 
   _handleSubmitImage(e) {
@@ -67,6 +69,7 @@ export class MessageBox extends React.Component {
     var storageRef = firebase.storage().ref('/images').child(this.state.file.name);
     var uploadTask = storageRef.put(this.state.file);
     var groupId = this.props.groupId;
+    var cap = this.state.photoCaption;
     uploadTask.on('state_changed', function (snapshot) {
       // Observe state change events such as progress, pause, and resume
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -86,17 +89,19 @@ export class MessageBox extends React.Component {
       // Handle successful uploads on complete
       // For instance, get the download URL: https://firebasestorage.googleapis.com/...
       var downloadURL = uploadTask.snapshot.downloadURL;
+      
       var messageRef = firebase.database().ref('groups/' + groupId);
       var newMessage = {
         type: "image",
         image: downloadURL,
         userId: firebase.auth().currentUser.uid,
         time: firebase.database.ServerValue.TIMESTAMP,
+        caption: cap
       };
       messageRef.child('messages').push(newMessage);
 
     });
-    this.setState({ file: '', imagePreviewUrl: '' })
+    this.setState({ file: '', imagePreviewUrl: '' , photoCaption: ''})
   }
 
   _handleImageChange(e) {
@@ -117,6 +122,14 @@ export class MessageBox extends React.Component {
   //when the text in the form changes, update state value
   updatePost(event) {
     this.setState({ post: event.target.value });
+  }
+
+  updatePhotoCaption(event) {
+    this.setState({photoCaption: event.target.value});
+  }
+
+  updateVideoCaption(event) {
+    this.setState({videoCaption: event.target.value});
   }
 
   //Posts a new Message to the database. These are saved under the group they belong to within
@@ -171,11 +184,12 @@ export class MessageBox extends React.Component {
               </DropdownButton>
               <DropdownButton dropup noCaret title="Post a Photo" class="choice-button">
                 <div className="previewComponent">
-                  <form onSubmit={(e) => this._handleSubmit(e)}>
+                  <form onSubmit={(e) => this._handleSubmit(e)} onSelect = {(e) => e.stopPropagation()}>
                     <input className="fileInput"
                       type="file"
                       onSelect = {(e) => e.stopPropagation()}
                       onChange={(e) => this._handleImageChange(e)} />
+                    <textarea placeholder="Add a caption" value={this.state.photoCaption}  onChange={(e) => this.updatePhotoCaption(e)} className="form-control"></textarea>
                     <button className="submitButton"
                       type="submit"
                       onClick={(e) => this._handleSubmitImage(e)}>Upload Image</button>
@@ -192,6 +206,7 @@ export class MessageBox extends React.Component {
                       type="file"
                       onSelect = {(e) => e.stopPropagation()}
                       onChange={(e) => this._handleImageChange(e)} />
+                    <textarea placeholder="Add a caption" value={this.state.videoCaption} onSelect = {(e) => e.stopPropagation()} onChange={(e) => this.updateVideoCaption(e)} className="form-control"></textarea>
                     <button className="submitButton"
                       type="submit"
                       onClick={(e) => this._handleSubmitVideo(e)}>Upload An .mp4 File</button>
@@ -437,10 +452,16 @@ class MessageItem extends React.Component {
 
               </div>
               {this.props.Message.image &&
+              <div>
                 <div className="image"><Image src={this.props.Message.image} responsive /></div>
+                <div className="caption">{this.props.Message.caption}</div>
+              </div>
               }
               {this.props.Message.video &&
+              <div>
                 <div className="video"><video id="my-video" class="video-js" controls preload="auto" width="500" height="300" data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
+                <div className="caption">{this.props.Message.caption}</div>
+                </div>
               }
               {/* Show the text of the Message */}
               <div className="Message">{this.props.Message.text}</div>
