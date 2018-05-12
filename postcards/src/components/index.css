@@ -20,9 +20,8 @@ html, body {
   background-color: white;
   border-radius: 20px;
   box-shadow: 10px 10px #006699;
-
-
-
+  z-index: 1;
+  /* position: absolute; */
 }
 
 .message-content {
@@ -125,6 +124,32 @@ button.list-group-item {
   padding-left: 15px;
 }
 
+/* .testClass {
+  background-color: black;
+  -webkit-animation: mymove 2s infinite;
+    animation: mymove 2s infinite;
+} */
+
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes mymove {
+    /* from {top: 0px;} */
+    to {top: -500px;}
+}
+
+/* Standard syntax */
+@keyframes mymove {
+    to {top: -500px;}
+}
+
+.float-off {
+  z-index: -1;
+  /* position: absolute; */
+}
+#float-off {
+  z-index: -1;
+  /* position: absolute; */
+}
 
 .example-enter {
     opacity: 0;
@@ -152,4 +177,36 @@ button.list-group-item {
 	opacity: 0;
 	transform:   translate(250px,0);
 	transform: translate3d(250px,0,0);
+}
+
+.testMove {
+    /* width: 100px;
+    height: 100px;
+    background: red;
+    position :relative; */
+
+    background: red;
+    position :absolute;
+    -webkit-animation: mymove 2s; /* Safari 4.0 - 8.0 */
+    animation: mymove 2s;
+}
+
+#testMove div.clicked{
+  -webkit-animation: vertical-move 5s;
+  animation: vertical-move 5s;
+}
+
+/* .testMove img {
+    -webkit-transition:1s;
+}
+.testMove img.clicked{
+    margin-left:50px;
+ } */
+
+
+
+
+@keyframes vertical-move {
+  from, to   {top: 0px;}
+  25%, 75%  {top: 50px;}
 }

@@ -3,6 +3,8 @@ import Time from 'react-time'
 import firebase from 'firebase'
 import {Box, Card} from './CardAnimation.js'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import TransitionGroup from 'react-addons-transition-group';
+import { TweenMax } from 'gsap';
 
 //import noUserPic from './no-user-pic.png';
 
@@ -215,7 +217,8 @@ export class MessageList extends React.Component {
     super(props);
     this.state = { Messages: [],
                    index: 0,
-                   maxLength: 1
+                   maxLength: 1,
+                   move: 0
                  };
     this.raiseIndex = this.raiseIndex.bind(this);
     this.lowerIndex = this.lowerIndex.bind(this);
@@ -264,8 +267,12 @@ export class MessageList extends React.Component {
 
   raiseIndex(event) {
     event.preventDefault();
-    this.setState({index: (this.state.index + 1)})
+    //var test = document.getElementsByClassName("float-off");
+    var test = document.getElementById("float-off");
+    test.classList.toggle('testMove');
+    //console.log(test.classList);
 
+    this.setState({index: (this.state.index + 1)})
   }
 
   resetIndex(event) {
@@ -331,6 +338,38 @@ export class MessageList extends React.Component {
   }
 }
 
+// class BoxTest extends React.Component {
+//   componentWillEnter (callback) {
+//     const el = this.container;
+//     TweenMax.fromTo(el, 0.3, {y: 100, opacity: 0}, {y: 0, opacity: 1, onComplete: callback});
+//   }
+//
+//   componentWillLeave (callback) {
+//     const el = this.container;
+//     TweenMax.fromTo(el, 0.3, {y: 0, opacity: 1}, {y: -100, opacity: 0, onComplete: callback});
+//   }
+//
+//   render () {
+//     return <div className="box" ref={c => this.container = c}/>;
+//   }
+// }
+
+class BoxTest extends React.Component {
+  componentWillEnter (callback) {
+    const el = this.container;
+    TweenMax.fromTo(el, 0.3, {y: 100, opacity: 0}, {y: 0, opacity: 1, onComplete: callback});
+  }
+
+  componentWillLeave (callback) {
+    const el = this.container;
+    TweenMax.fromTo(el, 0.3, {y: 0, opacity: 1}, {y: -100, opacity: 0, onComplete: callback});
+  }
+
+  render () {
+    return <div className="box" ref={c => this.container = c}/>;
+  }
+}
+
 //A single Message
 class MessageItem extends React.Component {
   constructor(props) {
@@ -338,9 +377,17 @@ class MessageItem extends React.Component {
     this.state = { textUpdate: '',
                    leftCard: "leftValue",
                    rightCard: "rightValue",
-                   cardArray: [1, 2, 3]
-                 }
+                   cardArray: [1, 2, 3],
+                   shouldShowBox: true
+                 };
+    this.toggleBox = this.toggleBox.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);
+  }
+
+  toggleBox() {
+    this.setState({
+      shouldShowBox: !this.state.shouldShowBox,
+    });
   }
 
   componentWillMount() {
@@ -389,12 +436,13 @@ class MessageItem extends React.Component {
   // Called in return in render()
   createCards() {
     //console.log(this.state.cardArray)
+    console.log(this.props.messageItems);
     return this.state.cardArray.map((item, i) => {
 			return (
 				<Box key={item}
           onClick={() => console.log("called createCards()")}
           className="item">
-					{item}
+          {this.props.Message.text}
 				</Box>
 			);
 		});
@@ -417,49 +465,54 @@ class MessageItem extends React.Component {
 
       <div>
         {this.state && this.state.user &&
-          <div className="message-card">
-            <div className="message-content">
-              <div>
-                <ReactCSSTransitionGroup
-                  transitionName="example"
-                  transitionEnterTimeout={500}
-                  transitionLeaveTimeout={300}>
-                  {this.createCards()}
-                </ReactCSSTransitionGroup>
-                {/* Show the time of the Message (use a Time component!) */}
-                <span className="time"><Time value={this.props.Message.time} relative /></span>
-                {/* This image's src should be the user's avatar */}
-                {/* <img className="image" src={avatar} role="presentation" /> */}
 
-                {/* Show the user's handle */}
+            <div className="message-card">
+              <div className="message-content">
+                <div>
+                  <div>
+                  <ReactCSSTransitionGroup
+                    transitionName="example"
+                    transitionEnterTimeout={500}
+                    transitionLeaveTimeout={300}
+                    >
+                    <div>{this.createCards()}</div>
+                    </ReactCSSTransitionGroup>
+                  </div>
 
+                  {/* Show the time of the Message (use a Time component!) */}
+                  <span className="time"><Time value={this.props.Message.time} relative /></span>
+                  {/* This image's src should be the user's avatar */}
+                  {/* <img className="image" src={avatar} role="presentation" /> */}
 
+                  {/* Show the user's handle */}
+                </div>
+                {this.props.Message.image &&
+                  <div className="image"><Image src={this.props.Message.image} responsive /></div>
+                }
+                {this.props.Message.video &&
+                  <div className="video"><video id="my-video" class="video-js" controls preload="auto" width="500" height="300" data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
+                }
+                {/* Show the text of the Message */}
+                <div className="Message">{this.props.Message.text}</div>
+                <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
 
-              </div>
-              {this.props.Message.image &&
-                <div className="image"><Image src={this.props.Message.image} responsive /></div>
-              }
-              {this.props.Message.video &&
-                <div className="video"><video id="my-video" class="video-js" controls preload="auto" width="500" height="300" data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
-              }
-              {/* Show the text of the Message */}
-              <div className="Message">{this.props.Message.text}</div>
-              <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
+                {/* Create a section for showing Message likes */}
+                <div className="likes">
 
-              {/* Create a section for showing Message likes */}
-              <div className="likes">
+                  {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
+                  <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
 
-                {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
-                <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
-
-                {/* Show the total number of likes */}
-                <span>{/*space*/} {likeCount}</span>
-              </div>
-              <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
+                  {/* Show the total number of likes */}
+                  <span>{/*space*/} {likeCount}</span>
+                </div>
+                <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
+                </div>
               </div>
             </div>
-          </div>
         }
+        // <div className="message-card" id="float-off">
+        //   <div>{this.props.Message.text}</div>
+        // </div>
       </div>
     );
   }
