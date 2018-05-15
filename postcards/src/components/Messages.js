@@ -283,6 +283,7 @@ export class MessageList extends React.Component {
 
   render() {
     var messageItems = [];
+    const foo = this.props.foo;
     //don't show if don't have message data yet (to avoid partial loads)
     if (this.state && this.state.allMessages && (this.props.groupId != null)) {
       var groupToUse = this.state.allMessages[this.props.groupId]
@@ -290,8 +291,10 @@ export class MessageList extends React.Component {
         var newMessage = <MessageItem Message={groupToUse[i]}
           user={groupToUse[i].userId} group={this.props.groupId} />
         messageItems.push(newMessage);
+        console.log(newMessage);
       }
     }
+
 
     return (
 
@@ -336,9 +339,10 @@ class MessageItem extends React.Component {
   constructor(props) {
     super(props)
     this.state = { textUpdate: '',
-                   leftCard: "leftValue",
-                   rightCard: "rightValue",
-                   cardArray: [1, 2, 3]
+                   leftCard: ["LEFT 1", "LEFT 2"],
+                   rightCard: ["RIGHT 1", "RIGHT 2"],
+                   cardArray: [1, 2, 3],
+                   singleArray: []
                  }
     this.componentWillMount = this.componentWillMount.bind(this);
   }
@@ -390,14 +394,44 @@ class MessageItem extends React.Component {
   createCards() {
     //console.log(this.state.cardArray)
     return this.state.cardArray.map((item, i) => {
-			return (
-				<Box key={item}
-          onClick={() => console.log("called createCards()")}
-          className="item">
-					{item}
-				</Box>
-			);
+      var foo = <Box key={item}
+        onClick={() => console.log("called createCards()")}
+        className="item">
+        {item}
+      </Box>
+      return foo;
+      // return (
+			// 	<Box key={item}
+      //     onClick={() => console.log("called createCards()")}
+      //     className="item">
+			// 		{item}
+			// 	</Box>
+			// );
 		});
+  }
+
+  handleRemoveL(i) {
+    // Remove card from left deck
+    let newItems = this.state.leftCard.slice();
+    var removedCard = newItems[i];
+    newItems.splice(i, 1);
+    this.setState({leftCard: newItems});
+    // Add card to right deck
+    var newRightStack = this.state.rightCard;
+    newRightStack.push(removedCard);
+    this.setState({rightCard: newRightStack})
+  }
+
+  handleRemoveR(i) {
+    // Remove card from right deck
+    let newItems = this.state.rightCard.slice();
+    var removedCard = newItems[i];
+    newItems.splice(i, 1);
+    this.setState({rightCard: newItems});
+    //Add card to left left stack
+    var newLeftStack = this.state.leftCard;
+    newLeftStack.push(removedCard);
+    this.setState({leftCard: newLeftStack});
   }
 
   render() {
@@ -411,7 +445,33 @@ class MessageItem extends React.Component {
     }
     var user = this.state.user;
 
+    // var timeArray=[];
+    // while (this.props.Message.time) {
+    //   timeArray.push(this.props.Message.time);
+    //   // MessageList.raiseIndex();
+    //   {MessageList.raiseIndex()};
+    //   console.log("RAISED");
+    // }
+    // console.log(timeArray);
+
     //var avatar = (user.avatar ? user.avatar : noUserPic);
+
+
+    const itemsL = this.state.leftCard.map((item, i) => (
+        <Box key={item}
+          onClick={() => this.handleRemoveL(i)}
+          className="item">
+          {item}
+        </Box>
+    ));
+
+    const itemsR = this.state.rightCard.map((item, i) => (
+        <Box key={item}
+          onClick={() => this.handleRemoveR(i)}
+          className="item">
+          {item}
+        </Box>
+    ));
 
     return (
 
@@ -420,12 +480,14 @@ class MessageItem extends React.Component {
           <div className="message-card">
             <div className="message-content">
               <div>
-                <ReactCSSTransitionGroup
-                  transitionName="example"
-                  transitionEnterTimeout={500}
-                  transitionLeaveTimeout={300}>
-                  {this.createCards()}
-                </ReactCSSTransitionGroup>
+              <MessageList/>
+              <ReactCSSTransitionGroup
+                transitionName="example"
+                transitionEnterTimeout={500}
+                transitionLeaveTimeout={300}>
+                  <div>{itemsL}</div>
+                  <div>{itemsR}</div>
+              </ReactCSSTransitionGroup>
                 {/* Show the time of the Message (use a Time component!) */}
                 <span className="time"><Time value={this.props.Message.time} relative /></span>
                 {/* This image's src should be the user's avatar */}
@@ -460,6 +522,13 @@ class MessageItem extends React.Component {
             </div>
           </div>
         }
+        {/*<ReactCSSTransitionGroup
+          transitionName="example"
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={300}>
+            <Box>{itemsL}</Box>
+            <Box>{itemsR}</Box>
+        </ReactCSSTransitionGroup>*/}
       </div>
     );
   }
