@@ -179,6 +179,8 @@ class SignUpForm extends Component {
 
   }
 
+  //Handles the creation of an authenticated user.
+  //It also calls the function which handles submitting the profile image.
   onSubmit = (event) => {
     event.preventDefault();
     const {
@@ -191,9 +193,9 @@ class SignUpForm extends Component {
     } = this.state;
     auth.doCreateUserWithEmailAndPassword(email, password)
       .then(authUser => {
+        //This funtion will handle the uploading ofthe profile avatar to fire base.
+        //It will also facilitate pushing the user data up to firebase.
         this._handleSubmitImage(authUser, email, username)
-        // Create a user in your own accessible Firebase Database too
-        //console.log('made it here');
       })
       .catch(error => {
         this.setState(byPropKey('error', error));

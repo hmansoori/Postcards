@@ -2,6 +2,7 @@ import React from 'react';
 import { MessageBox, MessageList } from './Messages';
 import firebase from 'firebase';
 import withAuthorization from './withAuthorization';
+import { slide as Menu } from 'react-burger-menu';
 
 import { Col, ListGroup, ListGroupItem, Well, Collapse, Button } from 'react-bootstrap';
 
@@ -61,6 +62,7 @@ class GroupLinks extends React.Component {
     groupRef.child(newGroup).set({ groupName: this.state.textValue, code: groupCode });
     userRef.child('groups').child(newGroup).set(this.state.textValue);
     this.setState({ newGroup: { [newGroup]: { groupName: this.state.textValue} } })
+    this.setState({open: !this.state.open});
 
   }
 
@@ -74,12 +76,10 @@ class GroupLinks extends React.Component {
     var userRef = firebase.database().ref('users/' +userId);
     groupRef.on('value', (snapshot) => {
       snapshot.forEach((group) => {
-        console.log(group.val().code)
-        console.log(this.state.textValue)
         if (group.val().code == this.state.textValue) {
           userRef.child('groups').child(group.key).set(group.val().groupName);
-          console.log('here3')
-          this.setState({newGroup: {[group]: {groupName: group.val().groupName}}})
+          this.setState({newGroup: {[group]: {groupName: group.val().groupName}}});
+          this.setState({openJoin: !this.state.openJoin});
         }
       })
       
@@ -107,7 +107,7 @@ class GroupLinks extends React.Component {
       }
       return (
         <div>
-          <Col xs={2} className="Group-nav">
+          <Menu className="Group-nav">
             <h3>Your Groups</h3>
             <ListGroup className="list-unstyled">
               {groups}
@@ -146,8 +146,8 @@ class GroupLinks extends React.Component {
                 </div>
               </ListGroupItem>
             </ListGroup>
-          </Col>
-          <Col xs={10} className="message-section">
+          </Menu>
+          <Col xs={12} className="message-section">
           
 
         {/*render components to create new messages and display existing messages*/}

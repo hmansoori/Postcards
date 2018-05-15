@@ -29,6 +29,7 @@ export class MessageBox extends React.Component {
     var storageRef = firebase.storage().ref('/videos').child(this.state.file.name);
     var uploadTask = storageRef.put(this.state.file);
     var groupId = this.props.groupId;
+    var cap = this.state.videoCaption;
     uploadTask.on('state_changed', function (snapshot) {
       // Observe state change events such as progress, pause, and resume
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -49,7 +50,7 @@ export class MessageBox extends React.Component {
       // For instance, get the download URL: https://firebasestorage.googleapis.com/...
       var downloadURL = uploadTask.snapshot.downloadURL;
       var messageRef = firebase.database().ref('groups/' + groupId);
-      var cap = this.state.videoCaption;
+      
       var newMessage = {
         type: "video",
         video: downloadURL,
@@ -350,11 +351,11 @@ export class MessageList extends React.Component {
 class MessageItem extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { textUpdate: '',
-                   leftCard: "leftValue",
-                   rightCard: "rightValue",
-                   cardArray: [1, 2, 3]
-                 }
+    // this.state = { textUpdate: '',
+    //                leftCard: "leftValue",
+    //                rightCard: "rightValue",
+    //                cardArray: [1, 2, 3]
+    //              }
     this.componentWillMount = this.componentWillMount.bind(this);
   }
 
@@ -369,14 +370,14 @@ class MessageItem extends React.Component {
   }
 
   componentDidMount() {
-    var user = '';
-    var userRef = firebase.database().ref('users/' + this.props.user);
-    userRef.on('value', (snapshot) => {
-      var userObj = snapshot.val();
-      user = userObj;
-    });
+    // var user = '';
+    // var userRef = firebase.database().ref('users/' + this.props.user);
+    // userRef.on('value', (snapshot) => {
+    //   var userObj = snapshot.val();
+    //   user = userObj;
+    // });
 
-    this.setState({ user: user });
+    // this.setState({ user: user });
   }
 
 
@@ -402,18 +403,18 @@ class MessageItem extends React.Component {
 
   // Creates individual "cards" that are mapped to a key (TODO: key -> message)
   // Called in return in render()
-  createCards() {
-    //console.log(this.state.cardArray)
-    return this.state.cardArray.map((item, i) => {
-			return (
-				<Box key={item}
-          onClick={() => console.log("called createCards()")}
-          className="item">
-					{item}
-				</Box>
-			);
-		});
-  }
+  // createCards() {
+  //   //console.log(this.state.cardArray)
+  //   return this.state.cardArray.map((item, i) => {
+	// 		return (
+	// 			<Box key={item}
+  //         onClick={() => console.log("called createCards()")}
+  //         className="item">
+	// 				{item}
+	// 			</Box>
+	// 		);
+	// 	});
+  // }
 
   render() {
     //like styling, for fun!
@@ -424,48 +425,52 @@ class MessageItem extends React.Component {
       if (this.props.Message.likes[firebase.auth().currentUser.uid])
         iLike = true;
     }
-    var user = this.state.user;
-
-    //var avatar = (user.avatar ? user.avatar : noUserPic);
+    var userRef = firebase.database().ref('users/' + this.props.user);
+    var user;
+    userRef.on('value', (snapshot) => {
+      var userObj = snapshot.val();
+      user = userObj;
+    });
 
     return (
 
       <div>
-        {this.state && this.state.user &&
+        {this.state && this.props.group &&
           <div className="message-card">
-            <div className="message-content">
+          <span className="time"><Time value={this.props.Message.time} relative /></span>
+            <div>
               <div>
-                <ReactCSSTransitionGroup
+                {/* <ReactCSSTransitionGroup
                   transitionName="example"
                   transitionEnterTimeout={500}
                   transitionLeaveTimeout={300}>
                   {this.createCards()}
-                </ReactCSSTransitionGroup>
-                {/* Show the time of the Message (use a Time component!) */}
-                <span className="time"><Time value={this.props.Message.time} relative /></span>
-                {/* This image's src should be the user's avatar */}
-                {/* <img className="image" src={avatar} role="presentation" /> */}
-
-                {/* Show the user's handle */}
-
-
+                </ReactCSSTransitionGroup> */}
 
               </div>
               {this.props.Message.image &&
               <div>
-                <div className="image"><Image src={this.props.Message.image} responsive /></div>
-                <div className="caption">{this.props.Message.caption}</div>
+                <div className="message-content">
+                <img className="message-img" src={this.props.Message.image}/>
+                </div>
+                <div className="caption-container"> 
+                  <Image className="avatar-with-cap" src={user.avatarURL} circle responsive/>
+                  <p className="caption">{this.props.Message.caption}</p>
+                </div>
               </div>
               }
               {this.props.Message.video &&
               <div>
-                <div className="video"><video id="my-video" class="video-js" controls preload="auto" width="500" height="300" data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
-                <div className="caption">{this.props.Message.caption}</div>
+                <div className=" message-content video"><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
+                <div> 
+                  <Image className="avatar-with-cap" src={user.avatarURL} circle responsive/>
+                  <div className="caption">{this.props.Message.caption}</div>
+                </div>
                 </div>
               }
               {/* Show the text of the Message */}
               <div className="Message">{this.props.Message.text}</div>
-              <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
+              {/* <div className="user"> <span className="handle">{user.username}</span></div> */}
 
               {/* Create a section for showing Message likes */}
               <div className="likes">
@@ -476,8 +481,8 @@ class MessageItem extends React.Component {
                 {/* Show the total number of likes */}
                 <span>{/*space*/} {likeCount}</span>
               </div>
-              <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
-              </div>
+              {/* <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
+              </div> */}
             </div>
           </div>
         }

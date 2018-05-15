@@ -25,13 +25,9 @@ const Navigation = () =>
       : <NavigationNonAuth />
     }
   </AuthUserContext.Consumer>
+
+  //Navbar for when the user is succesfully logged in
   const NavigationAuth = () =>
-  // <ul>
-  //   <li><Link to={routes.LANDING}>Landing</Link></li>
-  //   <li><Link to={routes.GROUP}>Groups</Link></li>
-  //   <li><Link to={routes.ACCOUNT}>Account</Link></li>
-  //   <li><SignOutButton /></li>
-  // </ul>
 
   <Navbar >
       <Navbar.Header>
@@ -52,11 +48,9 @@ const Navigation = () =>
       </Nav>
     </Navbar>
 
+//Navbar for users that are not logged in
 const NavigationNonAuth = () =>
-  // <ul>
-  //   <li><Link to={routes.LANDING}>Landing</Link></li>
-  //   <li><Link to={routes.SIGN_IN}>Sign In</Link></li>
-  // </ul>
+
   <Navbar>
     <Navbar.Header>
       <a href="/">
