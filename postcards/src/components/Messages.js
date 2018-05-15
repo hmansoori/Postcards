@@ -273,6 +273,10 @@ export class MessageList extends React.Component {
     this.setState({index: 0});
   }
 
+  static testBitch() {
+    console.log("hollah");
+  }
+
   //When component will be removed
   componentWillUnmount() {
     //unregister listeners
@@ -288,7 +292,7 @@ export class MessageList extends React.Component {
     if (this.state && this.state.allMessages && (this.props.groupId != null)) {
       var groupToUse = this.state.allMessages[this.props.groupId]
       for (var i = 0; i < groupToUse.length; i++) {
-        var newMessage = <MessageItem Message={groupToUse[i]}
+        var newMessage = <MessageItem key={i} Message={groupToUse[i]} AllMessages={groupToUse}
           user={groupToUse[i].userId} group={this.props.groupId} />
         messageItems.push(newMessage);
         console.log(newMessage);
@@ -420,6 +424,7 @@ class MessageItem extends React.Component {
     var newRightStack = this.state.rightCard;
     newRightStack.push(removedCard);
     this.setState({rightCard: newRightStack})
+    // this.setState({rightCard: this.state.rightCard.concat(removedCard)});
   }
 
   handleRemoveR(i) {
@@ -432,9 +437,37 @@ class MessageItem extends React.Component {
     var newLeftStack = this.state.leftCard;
     newLeftStack.push(removedCard);
     this.setState({leftCard: newLeftStack});
+    // this.setState({leftCard: this.state.leftCard.concat(removedCard)});
+  }
+
+//////////////////
+
+  onItemActionLeft(id) {
+    const newLeftItems = this.state.leftCard.slice();
+    var foo = newLeftItems.splice(id, 1);
+    this.setState({
+      leftCard: newLeftItems,
+      rightCard: this.state.rightCard.concat(foo)
+    });
+    console.log("Called left");
+  }
+
+  onItemActionRight(id) {
+    const newRightItems = this.state.rightCard.slice();
+    var foo = newRightItems.splice(id, 1);
+    this.setState({
+      rightCard: newRightItems,
+      leftCard: this.state.leftCard.concat(foo)
+    });
+    console.log("Called right");
   }
 
   render() {
+    console.log(this.props.AllMessages);
+    // this.state = {
+    //   leftCard: this.props.AllMessages,
+    //   rightCard: [1, 2]
+    // };
     //like styling, for fun!
     var iLike = false;
     var likeCount = 0; //count likes
@@ -453,6 +486,12 @@ class MessageItem extends React.Component {
     //   console.log("RAISED");
     // }
     // console.log(timeArray);
+
+    // while (this.props.Message != null) {
+    //   this.state.singleArray.push(this.props.Message);
+    //   {MessageList.raiseIndex()};
+    //   console.log(this.state.singleArray);
+    // }
 
     //var avatar = (user.avatar ? user.avatar : noUserPic);
 
@@ -481,13 +520,28 @@ class MessageItem extends React.Component {
             <div className="message-content">
               <div>
               <MessageList/>
+              {/*<ReactCSSTransitionGroup
+                transitionName="example"
+                transitionEnterTimeout={3000}
+                transitionLeaveTimeout={3000}>
+                  <div>{itemsL}</div>
+              </ReactCSSTransitionGroup>*/}
+
               <ReactCSSTransitionGroup
                 transitionName="example"
-                transitionEnterTimeout={500}
-                transitionLeaveTimeout={300}>
-                  <div>{itemsL}</div>
-                  <div>{itemsR}</div>
+                transitionEnterTimeout={3000}
+                transitionLeaveTimeout={3000}>
+                  {this.state.leftCard.map((item, i) => {
+                    return (
+                      <Box key={item}
+                        onClick={this.onItemActionLeft.bind(this, i)}
+                        className="item">
+                        {item}
+                      </Box>
+                    );
+                  })}
               </ReactCSSTransitionGroup>
+
                 {/* Show the time of the Message (use a Time component!) */}
                 <span className="time"><Time value={this.props.Message.time} relative /></span>
                 {/* This image's src should be the user's avatar */}
@@ -522,6 +576,21 @@ class MessageItem extends React.Component {
             </div>
           </div>
         }
+        <ReactCSSTransitionGroup
+          transitionName="example"
+          transitionEnterTimeout={3000}
+          transitionLeaveTimeout={3000}>
+            {this.state.rightCard.map((item, i) => {
+              return (
+                <Box key={item}
+                  onClick={this.onItemActionRight.bind(this, i)}
+                  className="item">
+                  {item}
+                </Box>
+              );
+            })}
+        </ReactCSSTransitionGroup>
+
         {/*<ReactCSSTransitionGroup
           transitionName="example"
           transitionEnterTimeout={500}
@@ -532,6 +601,11 @@ class MessageItem extends React.Component {
       </div>
     );
   }
+}
+
+function FirstChild(props) {
+  const childrenArray = React.Children.toArray(props.Message);
+  return childrenArray[0] || null;
 }
 
 class EditBar extends React.Component {

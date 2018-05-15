@@ -66,7 +66,6 @@ export const Box = styled.div`
   width: 200px;
   height: 200px;
   transition: transform 300ms ease-in-out;
-  
 
   &:click {
     transform: translate(200px, 150px) rotate(20deg)
