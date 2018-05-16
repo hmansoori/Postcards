@@ -11,12 +11,12 @@ html, body {
 }
 
 .message-card {
-  margin: 50px;
+  
   padding: 20px;
   width: 600px;
   height: 700px;
   text-align: center;
-  margin: auto;
+  margin: 20px auto;
   background-color: white;
   border-radius: 20px;
   box-shadow: 10px 10px #006699;
@@ -34,6 +34,7 @@ html, body {
 .message-section {
   text-align: center;
   height: 100%;
+  padding-top: 20px;
 }
 
 .message-buttons {
@@ -78,6 +79,10 @@ html, body {
   border-radius: 20px;
 }
 
+button.list-group-item:active {
+  color: orange;
+}
+
 button.list-group-item {
   border: none;
   text-align: center;
@@ -88,6 +93,8 @@ button.list-group-item {
   text-align: center;
 }
 
+
+
 .list-group {
   border-radius: 20px;
 }
@@ -96,9 +103,6 @@ button.list-group-item {
   background-color: white;
   text-align: center;
 }
-
-
-
 
 .signupForm {
 
@@ -187,9 +191,53 @@ button.list-group-item {
   float: right;
 }
 
+/* Position and sizing of burger button */
 .bm-burger-button {
-  width: 20px;
-  height: 20px;
-  margin: 0px;
-  background-color: #006699;
+  position: fixed;
+  width: 50px;
+  height: 200px;
+  left: 0px;
+  top: 100px;
+
+}
+
+/* Color/shape of burger icon bars */
+.bm-burger-bars {
+  background: #373a47;
+}
+
+.bm-cross-button {
+  height: 40px;
+  width: 40px;
+}
+
+.bm-cross {
+  background: #bdc3c7;
+}
+
+button {
+  border: none;
+  background-color: #e6f2ff;
+}
+
+.bm-icon {
+  background-color: white;
+  text-orientation: sideways;
+  font-size: 18px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 10px 5px #006699;
+  
+}
+
+
+.vertical-label {
+  transform: rotate(270deg);
+  left: 0px;
+  width: 200px;
+  
+}
+
+.navbar {
+  margin: 0;
 }

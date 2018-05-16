@@ -102,13 +102,15 @@ class GroupLinks extends React.Component {
       var groups = [];
       //Populates list with names of available groups.
       for (var obj in this.state.group) {
-        var newItem = <ListGroupItem onClick={this.handleClick} id={obj} name={this.state.group[obj].groupName}>{this.state.group[obj].groupName}</ListGroupItem>
+        var newItem = <ListGroupItem 
+          onClick={this.handleClick} id={obj} 
+          name={this.state.group[obj].groupName}>{this.state.group[obj].groupName}: {this.state.group[obj].code}
+          </ListGroupItem>
         groups.push(newItem);
       }
       return (
         <div>
-          <Menu className="Group-nav" pageWrapId={"page-wrap"}>
-            <main id="page-wrap">
+          <Menu className="Group-nav" pageWrapId={"page-wrap"} disableOverlayClick customBurgerIcon={<button className="menu-button"><p className="vertical-label">Choose a Group</p></button>}>
             <h3>Your Groups</h3>
             <ListGroup className="list-unstyled">
               {groups}
@@ -147,7 +149,6 @@ class GroupLinks extends React.Component {
                 </div>
               </ListGroupItem>
             </ListGroup>
-            </main>
           </Menu>
 
           
@@ -155,7 +156,6 @@ class GroupLinks extends React.Component {
         {/*render components to create new messages and display existing messages*/}
             
             <MessageList groupId={this.state.groupId} name={this.state.groupName} />
-            {/* <MessageBox groupId={this.state.groupId} /> */}
 
         </div>
       );
