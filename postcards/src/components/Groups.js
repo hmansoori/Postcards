@@ -107,7 +107,8 @@ class GroupLinks extends React.Component {
       }
       return (
         <div>
-          <Menu className="Group-nav">
+          <Menu className="Group-nav" pageWrapId={"page-wrap"}>
+            <main id="page-wrap">
             <h3>Your Groups</h3>
             <ListGroup className="list-unstyled">
               {groups}
@@ -146,8 +147,9 @@ class GroupLinks extends React.Component {
                 </div>
               </ListGroupItem>
             </ListGroup>
+            </main>
           </Menu>
-          <Col xs={12} className="message-section">
+
           
 
         {/*render components to create new messages and display existing messages*/}
@@ -155,7 +157,6 @@ class GroupLinks extends React.Component {
             <MessageList groupId={this.state.groupId} name={this.state.groupName} />
             {/* <MessageBox groupId={this.state.groupId} /> */}
 
-          </Col>
         </div>
       );
     } else { //If the user currently has no groups, do not render groupList component in full

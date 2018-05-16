@@ -316,7 +316,7 @@ export class MessageList extends React.Component {
       <div>
 
       <Row>
-      <Col xs={10} class="message-section">
+      <Col xs={8} xsOffset={2} class="message-section">
       <div className="group-header">{this.props.groupName}</div>
           {messageItems[this.state.index]}
       </Col>
@@ -335,7 +335,7 @@ export class MessageList extends React.Component {
       </Col>
       </Row>
       <Row>
-      <Col xs={6} xsOffset={1}>
+      <Col xs={6} xsOffset={3}>
       <MessageBox groupId = {this.props.groupId} />
       </Col>
       </Row>

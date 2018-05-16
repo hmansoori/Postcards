@@ -93,10 +93,8 @@ button.list-group-item {
 }
 
 .Group-nav {
-  border-radius: 20px;
   background-color: white;
   text-align: center;
-  box-shadow: 10px 5px #006699;
 }
 
 
@@ -187,4 +185,11 @@ button.list-group-item {
 
 .likes {
   float: right;
+}
+
+.bm-burger-button {
+  width: 20px;
+  height: 20px;
+  margin: 0px;
+  background-color: #006699;
 }
