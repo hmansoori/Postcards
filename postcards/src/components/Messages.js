@@ -345,32 +345,11 @@ class MessageItem extends React.Component {
     this.state = { textUpdate: '',
                    leftCard: this.props.AllMessages.reverse(),
                    rightCard: [],
-                   cardArray: [1, 2, 3],
-                   singleArray: [{foo: "what"}]
                  }
     this.componentWillMount = this.componentWillMount.bind(this);
   }
 
   componentWillMount() {
-    ////////////// TODO
-    // console.log("who dis");
-    // console.log(this.props.AllMessages);
-    // var ugh = this.props.AllMessages;
-    // var ughArray = [];
-    // for (var i = 0; i < ugh.length; i++) {
-    //   ughArray.push(ugh[i]);
-    // }
-    // this.state = {
-    //   leftCard: ughArray,
-    //   rightCard: [1, 2]
-    // };
-    // console.log("state comp will mount");
-    // console.log(this.state.leftCard);
-    //////////////
-    console.log('fuck this shit');
-    console.log(this.props.AllMessages);
-
-
     var currentUser = firebase.auth().currentUser.uid;
     if (this.props.user === currentUser) {
       this.setState({ show: true });
@@ -421,54 +400,19 @@ class MessageItem extends React.Component {
     MessageLikes.set(likeObj) //update the likes!
   }
 
-  // Creates individual "cards" that are mapped to a key (TODO: key -> message)
+  // Creates individual "cards" that are mapped to a key
   // Called in return in render()
-  createCards() {
-    //console.log(this.state.cardArray)
-    return this.state.cardArray.map((item, i) => {
-      var foo = <Box key={item}
-        onClick={() => console.log("called createCards()")}
-        className="item">
-        {item}
-      </Box>
-      return foo;
-      // return (
-			// 	<Box key={item}
-      //     onClick={() => console.log("called createCards()")}
-      //     className="item">
-			// 		{item}
-			// 	</Box>
-			// );
-		});
-  }
-
-  // handleRemoveL(i) {
-  //   // Remove card from left deck
-  //   let newItems = this.state.leftCard.slice();
-  //   var removedCard = newItems[i];
-  //   newItems.splice(i, 1);
-  //   this.setState({leftCard: newItems});
-  //   // Add card to right deck
-  //   var newRightStack = this.state.rightCard;
-  //   newRightStack.push(removedCard);
-  //   this.setState({rightCard: newRightStack})
-  //   // this.setState({rightCard: this.state.rightCard.concat(removedCard)});
+  // createCards() {
+  //   //console.log(this.state.cardArray)
+  //   return this.state.cardArray.map((item, i) => {
+  //     var foo = <Box key={item}
+  //       onClick={() => console.log("called createCards()")}
+  //       className="item">
+  //       {item}
+  //     </Box>
+  //     return foo;
+	// 	});
   // }
-  //
-  // handleRemoveR(i) {
-  //   // Remove card from right deck
-  //   let newItems = this.state.rightCard.slice();
-  //   var removedCard = newItems[i];
-  //   newItems.splice(i, 1);
-  //   this.setState({rightCard: newItems});
-  //   //Add card to left left stack
-  //   var newLeftStack = this.state.leftCard;
-  //   newLeftStack.push(removedCard);
-  //   this.setState({leftCard: newLeftStack});
-  //   // this.setState({leftCard: this.state.leftCard.concat(removedCard)});
-  // }
-
-//////////////////
 
   onItemActionLeft(id) {
     const newLeftItems = this.state.leftCard.slice();
@@ -483,20 +427,6 @@ class MessageItem extends React.Component {
     console.log("RIGHT CARDS");
     console.log(this.state.rightCard);
 
-    // console.log("LEFT VALUE:");
-    // console.log(this.props.AllMessages);
-    // console.log("BEFORE RIGHT VALUE:");
-    // console.log(this.state.rightCard);
-
-    /*
-    const propsItems = this.props.AllMessages;
-    var spliceProps = propsItems.splice(0, 1);
-    this.setState({
-      rightCard: this.state.rightCard.concat(spliceProps)
-    });
-    console.log("AFTER RIGHT VALUE");
-    console.log(this.state.rightCard);
-    */
   }
 
   onItemActionRight(id) {
@@ -508,30 +438,9 @@ class MessageItem extends React.Component {
     });
     console.log("Called right");
     console.log(this.state.rightCard);
-
-    /*const newRightItems = this.state.rightCard.slice();
-    var foo = newRightItems.splice(id, 1);
-    this.setState({
-      rightCard: newRightItems,
-      //leftCard: this.props.AllMessages.concat(foo)
-    });
-    this.props.AllMessages.concat(foo);
-    console.log("Called right");
-    console.log(this.props.AllMessages);*/
   }
 
   render() {
-    // var ugh = this.props.AllMessages;
-    // var ughArray = [];
-    // for (var i = 0; i < ugh.length; i++) {
-    //   ughArray.push(ugh[i]);
-    // }
-    // console.log('ugh array');
-    // console.log(ughArray);
-    // this.state = {
-    //   leftCard: this.props.AllMessages,
-    //   rightCard: [1, 2]
-    // };
     //like styling, for fun!
     var iLike = false;
     var likeCount = 0; //count likes
@@ -589,22 +498,6 @@ class MessageItem extends React.Component {
                     );
                   })}
               </ReactCSSTransitionGroup>
-              {/*<ReactCSSTransitionGroup
-                transitionName="example"
-                transitionEnterTimeout={3000}
-                transitionLeaveTimeout={3000}>
-                  {this.props.AllMessages.map((item, i) => {
-                    return (
-                      <Box key={i}
-                        onClick={this.onItemActionLeft.bind(this, i)}
-                        className="item">
-                        {item.time}
-                        {item.text}
-                        {user.username}
-                      </Box>
-                    );
-                  })}
-              </ReactCSSTransitionGroup>*/}
 
                 {/* Show the time of the Message (use a Time component!) */}
                 <span className="time"><Time value={this.props.Message.time} relative /></span>
@@ -640,20 +533,6 @@ class MessageItem extends React.Component {
             </div>
           </div>
         }
-        {/*<ReactCSSTransitionGroup
-          transitionName="example"
-          transitionEnterTimeout={3000}
-          transitionLeaveTimeout={3000}>
-            {this.state.rightCard.map((item, i) => {
-              return (
-                <Box key={item}
-                  onClick={this.onItemActionRight.bind(this, i)}
-                  className="item">
-                  {item.text}
-                </Box>
-              );
-            })}
-        </ReactCSSTransitionGroup>*/}
 
         <ReactCSSTransitionGroup
           transitionName="example"
