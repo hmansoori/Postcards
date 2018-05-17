@@ -10,6 +10,10 @@ html, body {
 
 }
 
+.likes {
+
+}
+
 .message-card {
   margin: 50px;
   padding: 20px;
@@ -20,9 +24,6 @@ html, body {
   background-color: white;
   border-radius: 20px;
   box-shadow: 10px 10px #006699;
-
-
-
 }
 
 .message-content {
