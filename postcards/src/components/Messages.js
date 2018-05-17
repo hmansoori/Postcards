@@ -398,21 +398,8 @@ class MessageItem extends React.Component {
     }
 
     MessageLikes.set(likeObj) //update the likes!
-  }
 
-  // Creates individual "cards" that are mapped to a key
-  // Called in return in render()
-  // createCards() {
-  //   //console.log(this.state.cardArray)
-  //   return this.state.cardArray.map((item, i) => {
-  //     var foo = <Box key={item}
-  //       onClick={() => console.log("called createCards()")}
-  //       className="item">
-  //       {item}
-  //     </Box>
-  //     return foo;
-	// 	});
-  // }
+  }
 
   onItemActionLeft(id) {
     const newLeftItems = this.state.leftCard.slice();
@@ -441,7 +428,6 @@ class MessageItem extends React.Component {
   }
 
   render() {
-    //like styling, for fun!
     var iLike = false;
     var likeCount = 0; //count likes
     if (this.props.Message.likes) {
@@ -455,21 +441,20 @@ class MessageItem extends React.Component {
 
       <div>
         {this.state && this.state.user &&
-          <div className="message-card">
-            <div className="message-content">
-              <div>
-              <MessageList/>
-              <ReactCSSTransitionGroup
-                transitionName="example"
-                transitionEnterTimeout={3000}
-                transitionLeaveTimeout={3000}>
-                  {this.state.leftCard.map((item, i) => {
-                    return (
-                      <Box key={i}
-                        onClick={this.onItemActionLeft.bind(this, i)}
-                        className="item">
+        <div className="message-content">
+          <div>
+            <MessageList/>
+            <ReactCSSTransitionGroup
+              transitionName="example"
+              transitionEnterTimeout={3000}
+              transitionLeaveTimeout={3000}>
+                {this.state.leftCard.map((item, i) => {
+                  return (
+                    <Box key={i}
+                      /*onClick={this.onItemActionLeft.bind(this, i)}*/
+                      className="item">
+                      <div onClick={this.onItemActionLeft.bind(this, i)}>
                         <span className="time"><Time value={item.time} relative /></span>
-
                         {item.image &&
                           <div className="image"><Image src={item.image} responsive /></div>
                         }
@@ -479,101 +464,71 @@ class MessageItem extends React.Component {
                             <source src={this.props.Message.video} type='video/mp4'/></video>
                           </div>
                         }
+
                         {/* Show the text of the Message */}
                         <div className="Message">{item.text}</div>
                         <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
+                      </div>
+                      {/* Create a section for showing Message likes */}
+                      <div className="likes">
 
-                        {/* Create a section for showing Message likes */}
-                        <div className="likes">
+                        {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
+                        <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
 
-                          {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
-                          <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
-
-                          {/* Show the total number of likes */}
-                          <span>{/*space*/} {likeCount}</span>
-                        </div>
-                        <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
-                        </div>
-                      </Box>
-                    );
-                  })}
-              </ReactCSSTransitionGroup>
-
-                {/* Show the time of the Message (use a Time component!) */}
-                <span className="time"><Time value={this.props.Message.time} relative /></span>
-                {/* This image's src should be the user's avatar */}
-                {/* <img className="image" src={avatar} role="presentation" /> */}
-
-                {/* Show the user's handle */}
-
-
-
-              </div>
-              {this.props.Message.image &&
-                <div className="image"><Image src={this.props.Message.image} responsive /></div>
-              }
-              {this.props.Message.video &&
-                <div className="video"><video id="my-video" class="video-js" controls preload="auto" width="500" height="300" data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
-              }
-              {/* Show the text of the Message */}
-              <div className="Message">{this.props.Message.text}</div>
-              <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
-
-              {/* Create a section for showing Message likes */}
-              <div className="likes">
-
-                {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
-                <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
-
-                {/* Show the total number of likes */}
-                <span>{/*space*/} {likeCount}</span>
-              </div>
-              <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
-              </div>
-            </div>
+                        {/* Show the total number of likes */}
+                        <span>{/*space*/} {likeCount}</span>
+                      </div>
+                      <div> {this.state.show ? <EditBar message={item} group={this.props.group} /> : null}
+                      </div>
+                    </Box>
+                  );
+                })}
+            </ReactCSSTransitionGroup>
           </div>
+
+        </div>
         }
+        <div>
+          <ReactCSSTransitionGroup
+            transitionName="example"
+            transitionEnterTimeout={3000}
+            transitionLeaveTimeout={3000}>
+              {this.state.rightCard.map((item, i) => {
+                return (
+                  <Box key={i}
+                    onClick={this.onItemActionRight.bind(this, i)}
+                    className="item">
+                    <span className="time"><Time value={item.time} relative /></span>
 
-        <ReactCSSTransitionGroup
-          transitionName="example"
-          transitionEnterTimeout={3000}
-          transitionLeaveTimeout={3000}>
-            {this.state.rightCard.map((item, i) => {
-              return (
-                <Box key={i}
-                  onClick={this.onItemActionRight.bind(this, i)}
-                  className="item">
-                  <span className="time"><Time value={item.time} relative /></span>
+                    {item.image &&
+                      <div className="image"><Image src={item.image} responsive /></div>
+                    }
+                    {item.video &&
+                      <div className="video"><video id="my-video" class="video-js" controls preload="auto"
+                      width="500" height="300" data-setup="{}">
+                        <source src={this.props.Message.video} type='video/mp4'/></video>
+                      </div>
+                    }
+                    {/* Show the text of the Message */}
+                    <div className="Message">{item.text}</div>
+                    <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
 
-                  {item.image &&
-                    <div className="image"><Image src={item.image} responsive /></div>
-                  }
-                  {item.video &&
-                    <div className="video"><video id="my-video" class="video-js" controls preload="auto"
-                    width="500" height="300" data-setup="{}">
-                      <source src={this.props.Message.video} type='video/mp4'/></video>
+                    {/* Create a section for showing Message likes */}
+                    <div className="likes">
+
+                      {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
+                      <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
+
+                      {/* Show the total number of likes */}
+                      <span>{/*space*/} {likeCount}</span>
                     </div>
-                  }
-                  {/* Show the text of the Message */}
-                  <div className="Message">{item.text}</div>
-                  <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
-
-                  {/* Create a section for showing Message likes */}
-                  <div className="likes">
-
-                    {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
-                    <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
-
-                    {/* Show the total number of likes */}
-                    <span>{/*space*/} {likeCount}</span>
-                  </div>
-                  <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
-                  </div>
-                </Box>
-              );
-            })}
-        </ReactCSSTransitionGroup>
-
+                    <div> {this.state.show ? <EditBar message={item} group={this.props.group} /> : null}
+                    </div>
+                  </Box>
+                );
+              })}
+          </ReactCSSTransitionGroup>
+        </div>
       </div>
     );
   }
