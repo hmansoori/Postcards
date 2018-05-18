@@ -157,13 +157,10 @@ export class MessageBox extends React.Component {
     if (imagePreviewUrl) {
       $imagePreview = (<img src={imagePreviewUrl} height='300' width='500' />);
     } else {
-      $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
+      $imagePreview = (<div className="previewText">Preview Your File Once You Select It Here!</div>);
     }
     return (
 
-        <div>
-          {/* Show image of current user, who must be logged in */}
-          {/*<img className="image" src={currentUser.photoURL ? currentUser.photoURL : noUserPic} alt="user avatar" />*/}
           <div className="message-buttons">
             <div>
               <DropdownButton class="choice-button" dropup noCaret title="Write a Message" >
@@ -202,6 +199,9 @@ export class MessageBox extends React.Component {
               </DropdownButton>
               <DropdownButton dropup noCaret title="Share a Video" class="choice-button">
               <div className="previewComponent">
+              <div className="imgPreview">
+                    {$imagePreview}
+                  </div>
                   <form onSubmit={(e) => this._handleSubmitVideo(e)}>
                     <input className="fileInput"
                       type="file"
@@ -212,14 +212,11 @@ export class MessageBox extends React.Component {
                       type="submit"
                       onClick={(e) => this._handleSubmitVideo(e)}>Upload An .mp4 File</button>
                   </form>
-                  <div className="imgPreview">
-                    {$imagePreview}
-                  </div>
+                  
                 </div>
               </DropdownButton>
             </div>
           </div>
-        </div>
 
     );
   }
@@ -316,7 +313,7 @@ export class MessageList extends React.Component {
       <div>
 
       <Row class="message-section">
-      <Col xs={8} xsOffset={2} >
+      <Col xs={6} xsOffset={3} >
           {messageItems[this.state.index]}
       </Col>
 
@@ -460,8 +457,8 @@ class MessageItem extends React.Component {
               }
               {this.props.Message.video &&
               <div>
-                <div className=" message-content video"><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
-                <div> 
+                <div className=" message-content "><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
+                <div className="caption-container"> 
                   <Image className="avatar-with-cap" src={user.avatarURL} circle responsive/>
                   <div className="caption">{this.props.Message.caption}</div>
                 </div>

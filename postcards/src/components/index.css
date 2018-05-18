@@ -20,6 +20,7 @@ html, body {
   background-color: white;
   border-radius: 20px;
   box-shadow: 10px 10px #006699;
+  position: relative;
 
 }
 
@@ -43,7 +44,7 @@ html, body {
   position: fixed;
   z-index:  150;
   text-align: center;
-  margin: 0 auto;
+  margin: auto;
   background-color: white;
   height: 50px;
   border-top-left-radius: 20px;
@@ -240,4 +241,26 @@ button {
 
 .navbar {
   margin: 0;
+}
+
+.submitButton {
+  color: white;
+  background-color: #006699;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.previewComponent {
+  padding: 20px;
+  border: none;
+}
+
+.video-js {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+video {
+  
 }
