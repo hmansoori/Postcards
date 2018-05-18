@@ -14,14 +14,6 @@ html, body {
 
 }
 
-.leftDeck {
-  float: left;
-}
-
-.rightDeck {
-  float: right;
-}
-
 .message-card {
   margin: 50px;
   padding: 20px;
@@ -32,6 +24,13 @@ html, body {
   background-color: white;
   border-radius: 20px;
   box-shadow: 10px 10px #006699;
+}
+.leftDeck {
+  float: left;
+}
+
+.rightDeck {
+  float: right;
 }
 
 .message-content {
@@ -110,12 +109,7 @@ button.list-group-item {
   box-shadow: 10px 5px #006699;
 }
 
-
-
-
 .signupForm {
-
-
   position: absolute;
   margin: auto;
   top: 0;
@@ -135,15 +129,7 @@ button.list-group-item {
 }
 
 
-/* .example-appear {
-  opacity: 0.01;
-}
-
-.example-appear.example-appear-active {
-  opacity: 1;
-  transition: opacity .5s ease-in;
-} */
-
+/* MESSAGES COMPONENT: CARD ANIMATIONS */
 .rightTransition-enter {
     opacity: 0;
     /* transform:   translate(-250px,0);
@@ -171,10 +157,10 @@ button.list-group-item {
 .rightTransition-leave.rightTransition-leave-active {
   /* transform: translate(-100%);
   transition: transform 1000ms ease-in-out; */
-	opacity: 0;
-  transition: opacity 100ms ease-out;
-	/* transform:   translate(500px,0);
-	transform: translate3d(500px,0,0); */
+	/* opacity: 0;
+  transition: opacity 100ms ease-out; */
+	transform:   translate(-500px,0);
+	transform: translate3d(-500px,0,0);
 }
 
 .leftTransition-enter {
@@ -184,7 +170,7 @@ button.list-group-item {
 }
 .leftTransition-enter.leftTransition-enter-active {
 	opacity: 1;
-  transition: opacity 3000ms ease-out;
+  transition: opacity 100ms ease-out;
 	/* transition: opacity 1s ease;
 	transform:   translate(0,0);
 	transform: translate3d(0,0,0);
