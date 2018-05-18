@@ -370,7 +370,7 @@ class MessageItem extends React.Component {
   componentWillReceiveProps(nextProps) {
     // alex trebek, what is bad code?
     if (nextProps.AllMessages !== this.state.leftCard) {
-      if (nextProps.AllMessages.length > 0) {
+      if (nextProps.AllMessages.length > 1) {
         if (nextProps.AllMessages[0].time > nextProps.AllMessages[1].time) {
           this.setState({
             leftCard: nextProps.AllMessages.reverse(),
