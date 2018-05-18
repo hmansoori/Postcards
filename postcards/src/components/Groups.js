@@ -92,6 +92,7 @@ class GroupLinks extends React.Component {
     var id = event.target.id;
     var name = event.target.name;
     this.setState({ groupId: id , groupName: name});
+    console.log(this.state.groupId);
   }
 
 
@@ -154,9 +155,9 @@ class GroupLinks extends React.Component {
           
 
         {/*render components to create new messages and display existing messages*/}
-            
+        {this.state.groupId !== undefined &&
             <MessageList groupId={this.state.groupId} name={this.state.groupName} />
-
+        }
         </div>
       );
     } else { //If the user currently has no groups, do not render groupList component in full

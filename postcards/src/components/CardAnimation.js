@@ -70,8 +70,8 @@ export const Box = styled.div`
 
   margin: 50px;
   padding: 20px;
-  width: 300px;
-  height: 400px;
+  width: 600px;
+  height: 700px;
   text-align: center;
   margin: auto;
   background-color: white;
