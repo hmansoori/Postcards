@@ -368,13 +368,50 @@ class MessageItem extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // You don't have to do this check first, but it can help prevent an unneeded render
-    if (nextProps.AllMessages.reverse() !== this.state.leftCard) {
-      this.setState({
-        leftCard: nextProps.AllMessages.reverse(),
-        rightCard: []
-      });
+    // alex trebek, what is bad code?
+    if (nextProps.AllMessages !== this.state.leftCard) {
+      if (nextProps.AllMessages.length > 0) {
+        if (nextProps.AllMessages[0].time > nextProps.AllMessages[1].time) {
+          this.setState({
+            leftCard: nextProps.AllMessages.reverse(),
+            rightCard: []
+          });
+          console.log("reversed");
+        } else {
+          this.setState({
+            leftCard: nextProps.AllMessages,
+            rightCard: []
+          });
+        }
+      } else {
+        this.setState({
+          leftCard: nextProps.AllMessages,
+          rightCard: []
+        });
+      }
+
+
     }
+
+    /*
+    if (nextProps.AllMessages !== this.props.AllMessages) {
+      if (nextProps.AllMessages[1] != null) {
+        if (nextProps.AllMessages[0].time > nextProps.AllMessages[1].time) {
+          this.setState({
+            leftCard: nextProps.AllMessages.reverse(),
+            rightCard: []
+          });
+          console.log("reversed");
+        }
+      } else {
+        this.setState({
+          leftCard: nextProps.AllMessages,
+          rightCard: []
+        });
+      }
+
+    }
+    /*
   }
 
 
