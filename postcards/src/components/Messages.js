@@ -273,10 +273,6 @@ export class MessageList extends React.Component {
     this.setState({index: 0});
   }
 
-  static testBitch() {
-    console.log("hollah");
-  }
-
   //When component will be removed
   componentWillUnmount() {
     //unregister listeners
@@ -312,8 +308,8 @@ export class MessageList extends React.Component {
           {messageItems[this.state.index]}
       </Col>
 
-      {/*
-      <Col xs={2} className="arrow-container">
+
+      {/*<Col xs={2} className="arrow-container">
         <div>
           <button className="arrow" disabled={this.state.index === 0} onClick={this.lowerIndex}><i class="fas fa-chevron-up fa-5x" ></i></button>
         </div>
@@ -323,13 +319,13 @@ export class MessageList extends React.Component {
         <div>
           <button className="refresh" onClick={this.resetIndex}><i class="fas fa-sync-alt fa-5x"></i></button>
         </div>
-      </Col>
+      </Col>*/}
       </Row>
       <Row>
       <Col xs={6} xsOffset={1}>
       <MessageBox groupId = {this.props.groupId} />
       </Col>
-      */}
+
       </Row>
       </div>
       }
@@ -375,7 +371,7 @@ class MessageItem extends React.Component {
     // You don't have to do this check first, but it can help prevent an unneeded render
     if (nextProps.AllMessages !== this.state.leftCard) {
       this.setState({
-        leftCard: nextProps.AllMessages,
+        leftCard: nextProps.AllMessages.reverse(),
         rightCard: []
       });
     }
