@@ -369,7 +369,7 @@ class MessageItem extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     // You don't have to do this check first, but it can help prevent an unneeded render
-    if (nextProps.AllMessages !== this.state.leftCard) {
+    if (nextProps.AllMessages.reverse() !== this.state.leftCard) {
       this.setState({
         leftCard: nextProps.AllMessages.reverse(),
         rightCard: []
