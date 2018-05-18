@@ -312,7 +312,7 @@ export class MessageList extends React.Component {
           {messageItems[this.state.index]}
       </Col>
 
-
+      {/*
       <Col xs={2} className="arrow-container">
         <div>
           <button className="arrow" disabled={this.state.index === 0} onClick={this.lowerIndex}><i class="fas fa-chevron-up fa-5x" ></i></button>
@@ -329,6 +329,7 @@ export class MessageList extends React.Component {
       <Col xs={6} xsOffset={1}>
       <MessageBox groupId = {this.props.groupId} />
       </Col>
+      */}
       </Row>
       </div>
       }
@@ -442,10 +443,10 @@ class MessageItem extends React.Component {
       <div>
         {this.state && this.state.user &&
         <div className="message-content">
-          <div>
+          <div className="leftDeck">
             <MessageList/>
             <ReactCSSTransitionGroup
-              transitionName="example"
+              transitionName="leftTransition"
               transitionEnterTimeout={3000}
               transitionLeaveTimeout={3000}>
                 {this.state.leftCard.map((item, i) => {
@@ -485,50 +486,50 @@ class MessageItem extends React.Component {
                 })}
             </ReactCSSTransitionGroup>
           </div>
+          <div className="rightDeck">
+            <ReactCSSTransitionGroup
+              transitionName="rightTransition"
+              transitionEnterTimeout={3000}
+              transitionLeaveTimeout={3000}>
+                {this.state.rightCard.map((item, i) => {
+                  return (
+                    <Box key={i}
+                      onClick={this.onItemActionRight.bind(this, i)}
+                      className="item">
+                      <span className="time"><Time value={item.time} relative /></span>
 
+                      {item.image &&
+                        <div className="image"><Image src={item.image} responsive /></div>
+                      }
+                      {item.video &&
+                        <div className="video"><video id="my-video" class="video-js" controls preload="auto"
+                        width="500" height="300" data-setup="{}">
+                          <source src={this.props.Message.video} type='video/mp4'/></video>
+                        </div>
+                      }
+                      {/* Show the text of the Message */}
+                      <div className="Message">{item.text}</div>
+                      <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
+
+                      {/* Create a section for showing Message likes */}
+                      <div className="likes">
+
+                        {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
+                        <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
+
+                        {/* Show the total number of likes */}
+                        <span>{/*space*/} {likeCount}</span>
+                      </div>
+                      <div> {this.state.show ? <EditBar message={item} group={this.props.group} /> : null}
+                      </div>
+                    </Box>
+                  );
+                })}
+            </ReactCSSTransitionGroup>
+          </div>
         </div>
         }
-        <div>
-          <ReactCSSTransitionGroup
-            transitionName="example"
-            transitionEnterTimeout={3000}
-            transitionLeaveTimeout={3000}>
-              {this.state.rightCard.map((item, i) => {
-                return (
-                  <Box key={i}
-                    onClick={this.onItemActionRight.bind(this, i)}
-                    className="item">
-                    <span className="time"><Time value={item.time} relative /></span>
 
-                    {item.image &&
-                      <div className="image"><Image src={item.image} responsive /></div>
-                    }
-                    {item.video &&
-                      <div className="video"><video id="my-video" class="video-js" controls preload="auto"
-                      width="500" height="300" data-setup="{}">
-                        <source src={this.props.Message.video} type='video/mp4'/></video>
-                      </div>
-                    }
-                    {/* Show the text of the Message */}
-                    <div className="Message">{item.text}</div>
-                    <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
-
-                    {/* Create a section for showing Message likes */}
-                    <div className="likes">
-
-                      {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
-                      <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
-
-                      {/* Show the total number of likes */}
-                      <span>{/*space*/} {likeCount}</span>
-                    </div>
-                    <div> {this.state.show ? <EditBar message={item} group={this.props.group} /> : null}
-                    </div>
-                  </Box>
-                );
-              })}
-          </ReactCSSTransitionGroup>
-        </div>
       </div>
     );
   }
