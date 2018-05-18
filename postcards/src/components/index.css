@@ -10,6 +10,10 @@ html, body {
 
 }
 
+.likes {
+
+}
+
 .message-card {
   
   padding: 20px;
@@ -20,8 +24,18 @@ html, body {
   background-color: white;
   border-radius: 20px;
   box-shadow: 10px 10px #006699;
+<<<<<<< HEAD
   position: relative;
 
+=======
+}
+.leftDeck {
+  float: left;
+}
+
+.rightDeck {
+  float: right;
+>>>>>>> 24e4256b2d4bbd660bd655672585ddeec5a21c9a
 }
 
 .message-content {
@@ -106,8 +120,6 @@ button.list-group-item {
 }
 
 .signupForm {
-
-
   position: absolute;
   margin: auto;
   top: 0;
@@ -127,32 +139,71 @@ button.list-group-item {
 }
 
 
-.example-enter {
+/* MESSAGES COMPONENT: CARD ANIMATIONS */
+.rightTransition-enter {
     opacity: 0;
-    transform:   translate(-250px,0);
-    transform: translate3d(-250px,0,0);
+    /* transform:   translate(-250px,0);
+    transform: translate3d(-250px,0,0); */
 }
-.example-enter.example-enter-active {
+.rightTransition-enter.rightTransition-enter-active {
 	opacity: 1;
-	transition: opacity 1s ease;
+  transition: opacity 100ms ease-out;
+	/* transition: opacity 1s ease;
 	transform:   translate(0,0);
 	transform: translate3d(0,0,0);
 	transition-property: transform, opacity;
 	transition-duration: 300ms;
-	transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear;
+	transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear; */
 }
-.example-leave {
+
+.rightTransition-leave {
 	opacity: 1;
-	transform:   translate(0,0,0);
+	/* transform:   translate(0,0,0);
 	transform: translate3d(0,0,0);
   transition-property: transform, opacity;
 	transition-duration: 300ms;
-	transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear;
+	transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear; */
 }
-.example-leave.example-leave-active {
-	opacity: 0;
-	transform:   translate(250px,0);
-	transform: translate3d(250px,0,0);
+.rightTransition-leave.rightTransition-leave-active {
+  /* transform: translate(-100%);
+  transition: transform 1000ms ease-in-out; */
+	/* opacity: 0;
+  transition: opacity 100ms ease-out; */
+	transform:   translate(-500px,0);
+	transform: translate3d(-500px,0,0);
+}
+
+.leftTransition-enter {
+    opacity: 0;
+    /* transform:   translate(-250px,0);
+    transform: translate3d(-250px,0,0); */
+}
+.leftTransition-enter.leftTransition-enter-active {
+	opacity: 1;
+  transition: opacity 100ms ease-out;
+	/* transition: opacity 1s ease;
+	transform:   translate(0,0);
+	transform: translate3d(0,0,0);
+	transition-property: transform, opacity;
+	transition-duration: 300ms;
+	transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear; */
+}
+
+.leftTransition-leave {
+	opacity: 1;
+	/* transform:   translate(0,0,0);
+	transform: translate3d(0,0,0);
+  transition-property: transform, opacity;
+	transition-duration: 300ms;
+	transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear; */
+}
+.leftTransition-leave.leftTransition-leave-active {
+  /* transform: translate(-100%);
+  transition: transform 1000ms ease-in-out; */
+	/* opacity: 0;
+  transition: opacity 3000ms ease-out; */
+	transform:   translate(500px,0);
+	transform: translate3d(500px,0,0);
 }
 
 .avatar-with-cap {
