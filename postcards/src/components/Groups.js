@@ -53,13 +53,21 @@ class GroupLinks extends React.Component {
   createNewGroup(event) {
     event.preventDefault();
     this.setState({ group: '' })
-
     var groupRef = firebase.database().ref('groups')
     var currUser = firebase.auth().currentUser.uid;
     var userRef = firebase.database().ref('users/' + currUser)
+    var userObj;
+    userRef.on('value', (snapshot) => {
+      userObj = snapshot.val();
+    })
+    console.log(userObj);
     var newGroup = groupRef.push().key;
     var groupCode = Math.floor(1000 + Math.random() * 9000);
     groupRef.child(newGroup).set({ groupName: this.state.textValue, code: groupCode });
+    groupRef.child(newGroup).child('users').child(currUser).set({
+      username: userObj.username,
+      avatarURL: userObj.avatarURL
+    });
     userRef.child('groups').child(newGroup).set(this.state.textValue);
     this.setState({ newGroup: { [newGroup]: { groupName: this.state.textValue} } })
     this.setState({open: !this.state.open});
@@ -74,16 +82,25 @@ class GroupLinks extends React.Component {
     var groupRef = firebase.database().ref('groups');
     var userId = firebase.auth().currentUser.uid;
     var userRef = firebase.database().ref('users/' +userId);
-    groupRef.on('value', (snapshot) => {
-      snapshot.forEach((group) => {
-        if (group.val().code == this.state.textValue) {
-          userRef.child('groups').child(group.key).set(group.val().groupName);
-          this.setState({newGroup: {[group]: {groupName: group.val().groupName}}});
-          this.setState({openJoin: !this.state.openJoin});
-        }
+    var userObj;
+    userRef.on('value', (snapshot) => {
+      userObj = snapshot.val();
+      groupRef.on('value', (snapshot) => {
+        snapshot.forEach((group) => {
+          if (group.val().code == this.state.textValue) {
+            userRef.child('groups').child(group.key).set(group.val().groupName);
+            groupRef.child(group.key).child('users').child(userId).set({
+              username: userObj.username,
+              avatarURL: userObj.avatarURL
+            })
+            this.setState({newGroup: {[group]: {groupName: group.val().groupName}}});
+            this.setState({openJoin: !this.state.openJoin});
+          }
+        })
+        
       })
-      
     })
+    
   }
 
   //Changes the groupID in state when the user clicks on a group in the list.
@@ -92,7 +109,6 @@ class GroupLinks extends React.Component {
     var id = event.target.id;
     var name = event.target.name;
     this.setState({ groupId: id , groupName: name});
-    console.log(this.state.groupId);
   }
 
 

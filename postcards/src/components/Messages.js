@@ -230,6 +230,7 @@ export class MessageList extends React.Component {
                    index: 0,
                    maxLength: 1,
                    rightCard: [],
+                   userObjects: [],
                  };
     this.raiseIndex = this.raiseIndex.bind(this);
     this.lowerIndex = this.lowerIndex.bind(this);
@@ -250,11 +251,16 @@ export class MessageList extends React.Component {
       this.setState({ users: snapshot.val() });
     });
     var groupObject = {};
+    var userObject = {};
     var groupRef = firebase.database().ref('groups');
     groupRef.on('value', (snapshot) => {
       this.setState({ groups: snapshot.val() });
       snapshot.forEach((group) => {
         var groupMessages = [];
+        console.log(group.key);
+        console.log(group.val().users);
+        userObject[group.key] = group.val().users;
+       
         for (var message in group.val().messages) {
           var obj = group.val().messages[message];
           obj.key = message;
@@ -264,11 +270,10 @@ export class MessageList extends React.Component {
         groupObject[group.key] = groupMessages;
       })
       
-      console.log(groupObject[this.props.groupId]);
-      this.setState({ groupToUse: groupObject[this.props.groupId], leftCard: groupObject[this.props.groupId].reverse()});
+      this.setState({ allMessages: groupObject });
+      this.setState({ userObjects: userObject});
 
     })
-
   }
 
 
@@ -297,42 +302,20 @@ export class MessageList extends React.Component {
     firebase.database().ref('groups').off();
   }
 
-  onItemActionLeft(id) {
-    const newLeftItems = this.state.leftCard.slice();
-    var foo = newLeftItems.splice(id, 1);
-    this.setState({
-      leftCard: newLeftItems,
-      rightCard: this.state.rightCard.concat(foo)
-    });
-    console.log("Called left");
-    console.log("LEFT CARDS");
-    console.log(this.state.leftCard);
-    console.log("RIGHT CARDS");
-    console.log(this.state.rightCard);
-
-  }
-
-  onItemActionRight(id) {
-    const newRightItems = this.state.rightCard.slice();
-    var foo = newRightItems.splice(id, 1);
-    this.setState({
-      leftCard: this.state.leftCard.concat(foo),
-      rightCard: newRightItems
-    });
-    console.log("Called right");
-    console.log(this.state.rightCard);
-  }
-
   render() {
     var messageItems = [];
     const foo = this.props.foo;
     //don't show if don't have message data yet (to avoid partial loads)
-    if (this.state && this.state.groupToUse && (this.props.groupId != null)) {
-      for (var i = 0; i < this.state.groupToUse.length; i++) {
-        var newMessage = <MessageItem key={i} Message={this.state.groupToUse[i]} AllMessages={this.state.groupToUse}
-          user={this.state.groupToUse[i].userId} group={this.props.groupId} onClick={this.onItemActionLeft.bind(this, i)}/>
+    if (this.state && this.state.allMessages && (this.props.groupId != null)) {
+      var groupToUse = this.state.allMessages[this.props.groupId];
+      var usersToUse = this.state.userObjects[this.props.groupId];
+      for (var i = 0; i < groupToUse.length; i++) {
+        var newMessage = <MessageItem key={i} Message={groupToUse[i]} AllMessages={groupToUse.reverse()}
+          userObj={usersToUse} group={this.props.groupId}/>
         messageItems.push(newMessage);
       }
+      //console.log(groupToUse.reverse())
+      
     }
 
 
@@ -341,26 +324,7 @@ export class MessageList extends React.Component {
   <div>
       <Row class="message-section">
       <Col xs={6} xsOffset={3} >
-      <div className="leftDeck">
-      <ReactCSSTransitionGroup
-              transitionName="leftTransition"
-              transitionEnterTimeout={3000}
-              transitionLeaveTimeout={3000}>
-                
-              {messageItems}
-                
-          </ReactCSSTransitionGroup>
-          </div>
-          <div className="rightDeck">
-          <ReactCSSTransitionGroup
-              transitionName="leftTransition"
-              transitionEnterTimeout={3000}
-              transitionLeaveTimeout={3000}>
-                
-              {messageItems}
-                
-          </ReactCSSTransitionGroup>
-          </div>
+          {messageItems[this.state.index]}
       </Col>
 
 
@@ -421,7 +385,8 @@ class MessageItem extends React.Component {
             leftCard: nextProps.AllMessages.reverse(),
             rightCard: []
           });
-          console.log("reversed");
+          console.log(this.state.leftCard)
+          //console.log("reversed");
         } else {
           this.setState({
             leftCard: nextProps.AllMessages,
@@ -495,7 +460,6 @@ class MessageItem extends React.Component {
       if (this.props.Message.likes[firebase.auth().currentUser.uid])
         iLike = true;
     }
-    console.log(this.props.Message)
     var userRef = firebase.database().ref('users/' + this.props.user);
     var user;
     userRef.on('value', (snapshot) => {
@@ -509,43 +473,43 @@ class MessageItem extends React.Component {
         {this.state && this.props.group &&
         <div className="message-content">
           <div className="leftDeck">
-            {/* <MessageList/> */}
-            {/* <ReactCSSTransitionGroup
+            <ReactCSSTransitionGroup
+            className='container'
               transitionName="leftTransition"
               transitionEnterTimeout={3000}
               transitionLeaveTimeout={3000}>
                 {this.state.leftCard.map((item, i) => {
-                  return ( */}
+                  return (
                     <Box key={this.props.key}
                       /*onClick={this.onItemActionLeft.bind(this, i)}*/
                       className="item">
-                      {/* <div onClick={this.onItemActionLeft.bind(this, i)}> */}
-                        <span className="time"><Time value={this.props.Message.time} relative /></span>
-                        {this.props.Message.image &&
+                      <div onClick={this.onItemActionLeft.bind(this, i)}>
+                        <span className="time"><Time value={item.time} relative /></span>
+                        {item.image &&
                           <div>
                           <div className="message-content">
-                          <img className="message-img" src={this.props.Message.image}/>
+                          <img className="message-img" src={item.image}/>
                           </div>
                           <div className="caption-container"> 
-                            {/* <Image className="avatar-with-cap" src={user.avatarURL} circle responsive/> */}
-                            <p className="caption">{this.props.Message.caption}</p>
+                            <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
+                            <p className="caption">{item.caption}</p>
                           </div>
                         </div>
                         }
-                        {this.props.Message.video &&
+                        {item.video &&
                           <div>
                           <div className=" message-content "><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
                           <div className="caption-container"> 
-                            {/* <Image className="avatar-with-cap" src={user.avatarURL} circle responsive/> */}
-                            <div className="caption">{this.props.Message.caption}</div>
+                            <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
+                            <div className="caption">{item.caption}</div>
                           </div>
                           </div>
                         }
 
                         {/* Show the text of the Message */}
-                        <div className="Message">{this.props.Message.text}</div>
-                        <div className="user"> <span className="handle">{this.props.Message.userId} {/*space*/}</span></div>
-                      {/* </div> */}
+                        <div className="Message">{item.text}</div>
+                        <div className="user"> <span className="handle">{this.props.userObj[item.userId].username} {/*space*/}</span></div>
+                      </div>
                       {/* Create a section for showing Message likes */}
                       <div className="likes">
 
@@ -558,12 +522,13 @@ class MessageItem extends React.Component {
                       <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
                       </div>
                     </Box>
-                  {/* );
+                   );
                 })}
-            </ReactCSSTransitionGroup> */}
+            </ReactCSSTransitionGroup> 
           </div>
           <div className="rightDeck">
             <ReactCSSTransitionGroup
+            className='container'
               transitionName="rightTransition"
               transitionEnterTimeout={3000}
               transitionLeaveTimeout={3000}>
@@ -580,7 +545,7 @@ class MessageItem extends React.Component {
                         <img className="message-img" src={item.image}/>
                         </div>
                         <div className="caption-container"> 
-                          {/* <Image className="avatar-with-cap" src={user.avatarURL} circle responsive/> */}
+                        <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
                           <p className="caption">{item.caption}</p>
                         </div>
                       </div>
@@ -589,14 +554,14 @@ class MessageItem extends React.Component {
                         <div>
                         <div className=" message-content "><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={item.video} type='video/mp4'/></video></div>
                         <div className="caption-container"> 
-                          {/* <Image className="avatar-with-cap" src={user.avatarURL} circle responsive/> */}
+                        <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
                           <div className="caption">{item.caption}</div>
                         </div>
                         </div>
                       }
                       {/* Show the text of the Message */}
                       <div className="Message">{item.text}</div>
-                      <div className="user"> <span className="handle">{user.username} {/*space*/}</span></div>
+                      <div className="user"> <span className="handle">{this.props.userObj[item.userId].username} {/*space*/}</span></div>
 
                       {/* Create a section for showing Message likes */}
                       <div className="likes">

@@ -139,6 +139,10 @@ button.list-group-item {
 
 
 /* MESSAGES COMPONENT: CARD ANIMATIONS */
+.container{
+  position: relative;
+}
+
 .rightTransition-enter {
     opacity: 0;
     /* transform:   translate(-250px,0);
