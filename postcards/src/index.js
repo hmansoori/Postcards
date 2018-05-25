@@ -4,7 +4,7 @@ import { unregister } from './registerServiceWorker';
 import App from './components/App'; //import our component
 
 //load our CSS file
-import './components/index.css';
+import styles from './components/index.css';
 
 //unregister service worker (conflicts with firebase on chrome)
 unregister();
