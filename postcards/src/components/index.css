@@ -15,7 +15,7 @@ html, body {
 }
 
 .message-card {
-  
+
   padding: 20px;
   width: 600px;
   height: 700px;
@@ -128,7 +128,15 @@ button.list-group-item {
   max-width: 600px;
   max-height: 300px;
   text-align: center;
+}
 
+.signInForm {
+  position: relative;
+  margin: auto;
+  max-width: 600px;
+  max-height: 300px;
+  text-align: center;
+  padding-bottom: 10px;
 }
 
 .sign-out {
@@ -228,7 +236,7 @@ button.list-group-item {
 }
 
 .time {
-  padding: 20px 0; 
+  padding: 20px 0;
   font-size: 18px;
   text-transform: uppercase;
 }
@@ -282,7 +290,7 @@ button {
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
   box-shadow: 10px 5px #006699;
-  
+
 }
 
 
@@ -290,7 +298,7 @@ button {
   transform: rotate(270deg);
   left: 0px;
   width: 200px;
-  
+
 }
 
 .navbar {
@@ -316,5 +324,5 @@ button {
 }
 
 video {
-  
+
 }

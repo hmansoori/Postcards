@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { Button, FormGroup, FormControl } from 'react-bootstrap';
+
 
 import { auth } from '../firebase';
 
 const PasswordForgetPage = () =>
-  <div>
-    <h1>PasswordForget</h1>
+  <div className="signupForm">
+    <h1>Reset Your Password</h1>
+    <div>
+      Don't worry! You may have forgotten your password, but we can help you out.
+      Enter your username below and we'll email you a link to reset your password.
+    </div>
+    <br></br>
     <PasswordForgetForm />
   </div>
 
@@ -48,19 +55,25 @@ class PasswordForgetForm extends Component {
     const isInvalid = email === '';
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          value={this.state.email}
-          onChange={event => this.setState(byPropKey('email', event.target.value))}
-          type="text"
-          placeholder="Email Address"
-        />
-        <button disabled={isInvalid} type="submit">
-          Reset My Password
-        </button>
+        <form onSubmit={this.onSubmit} className="signInForm">
 
-        { error && <p>{error.message}</p> }
-      </form>
+          <FormGroup controlId="email">
+            <FormControl
+              value={this.state.email}
+              onChange={event => this.setState(byPropKey('email', event.target.value))}
+              type="text"
+              placeholder="Email Address"
+            />
+            <FormControl.Feedback />
+          </FormGroup>
+
+
+          <Button bsStyle="primary" disabled={isInvalid} type="submit">
+            Email Me
+          </Button>
+
+          { error && <p>{error.message}</p> }
+        </form>
     );
   }
 }
