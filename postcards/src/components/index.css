@@ -30,7 +30,6 @@ html, body {
   .item {
     width: 240px;
     height: 310px;
-    
   }
   .time {
     padding: 10px 0; 
@@ -212,8 +211,8 @@ html, body {
   transition: transform 1000ms ease-in-out; */
 	/* opacity: 0;
   transition: opacity 100ms ease-out; */
-	transform:   translate(-175px,0);
-	transform: translate3d(-175px,0,0);
+	transform:   translate(-345px,0);
+	transform: translate3d(-345px,0,0);
 }
 
 .leftTransition-enter {
@@ -245,8 +244,8 @@ html, body {
   transition: transform 1000ms ease-in-out; */
 	/* opacity: 0;
   transition: opacity 3000ms ease-out; */
-	transform:   translate(175px,0);
-	transform: translate3d(175px,0,0);
+	transform:   translate(345px,0);
+	transform: translate3d(345px,0,0);
 }
 .handle {
   float: left;
@@ -416,16 +415,16 @@ html, body {
       transition: transform 1000ms ease-in-out; */
       /* opacity: 0;
       transition: opacity 100ms ease-out; */
-      transform:   translate(-295px,0);
-      transform: translate3d(-295px,0,0);
+      transform:   translate(-500px,0);
+      transform: translate3d(-500px,0,0);
     }
     .leftTransition-leave.leftTransition-leave-active {
       /* transform: translate(-100%);
       transition: transform 1000ms ease-in-out; */
       /* opacity: 0;
       transition: opacity 3000ms ease-out; */
-      transform:   translate(295px,0);
-      transform: translate3d(295px,0,0);
+      transform:   translate(550px,0);
+      transform: translate3d(550px,0,0);
     }
     .message {
       background-color: #e6f2ff;

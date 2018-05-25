@@ -473,7 +473,7 @@ class MessageItem extends React.Component {
 
       <div>
         {this.state && this.props.group &&
-        <div className="message-content">
+        <div className="message-container">
           <div className="leftDeck">
             <ReactCSSTransitionGroup
             className='container'
