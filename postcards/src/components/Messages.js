@@ -6,7 +6,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 //import noUserPic from './no-user-pic.png';
 
-import {Image, Row, Col, Collapse, Well, Modal, Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
+import {Image, Row, Col, Collapse, Well, Modal, Button, ButtonGroup, DropdownButton, Dropdown } from 'react-bootstrap';
 import { isNullOrUndefined } from 'util';
 
 // A form the user can use to post a Message
@@ -155,7 +155,7 @@ export class MessageBox extends React.Component {
     let { imagePreviewUrl } = this.state;
     let $imagePreview = null;
     if (imagePreviewUrl) {
-      $imagePreview = (<img src={imagePreviewUrl} height='300' width='500' />);
+      $imagePreview = (<img src={imagePreviewUrl} className="img-preview" />);
     } else {
       $imagePreview = (<div className="previewText">Preview Your File Once You Select It Here!</div>);
     }
@@ -163,7 +163,7 @@ export class MessageBox extends React.Component {
 
           <div className="message-buttons">
             <div>
-              <DropdownButton class="choice-button" dropup noCaret title="Write a Message" >
+              <DropdownButton class="choice-button text-button" dropup noCaret title="Write a Message">
                 <div>
                   <Well>
                     <form onSelect = {(e) => e.stopPropagation()}>
@@ -180,7 +180,7 @@ export class MessageBox extends React.Component {
                   </Well>
                 </div>
               </DropdownButton>
-              <DropdownButton dropup noCaret title="Post a Photo" class="choice-button">
+              <DropdownButton dropup noCaret title="Post a Photo" class="choice-button photo-button" pullRight>
                 <div className="previewComponent">
                   <form onSubmit={(e) => this._handleSubmit(e)} onSelect = {(e) => e.stopPropagation()}>
                     <input className="fileInput"
@@ -197,7 +197,7 @@ export class MessageBox extends React.Component {
                   </div>
                 </div>
               </DropdownButton>
-              <DropdownButton dropup noCaret title="Share a Video" class="choice-button">
+              <DropdownButton dropup noCaret title="Share a Video" class="choice-button video-button" id="video" pullRight>
               <div className="previewComponent">
               <div className="imgPreview">
                     {$imagePreview}
@@ -310,11 +310,10 @@ export class MessageList extends React.Component {
       var groupToUse = this.state.allMessages[this.props.groupId];
       var usersToUse = this.state.userObjects[this.props.groupId];
       for (var i = 0; i < groupToUse.length; i++) {
-        var newMessage = <MessageItem key={i} Message={groupToUse[i]} AllMessages={groupToUse.reverse()}
+        var newMessage = <MessageItem key={i} Message={groupToUse[i]} AllMessages={groupToUse}
           userObj={usersToUse} group={this.props.groupId}/>
         messageItems.push(newMessage);
       }
-      //console.log(groupToUse.reverse())
       
     }
 
@@ -323,7 +322,7 @@ export class MessageList extends React.Component {
 <div>
   <div>
       <Row class="message-section">
-      <Col xs={6} xsOffset={3} >
+      <Col xs={12} xsOffset={0} sm={10} smOffset={1} md={10} mdOffset={2} lg={6} lgOffset={3}>
           {messageItems[this.state.index]}
       </Col>
 
@@ -341,7 +340,7 @@ export class MessageList extends React.Component {
       </Col>*/}
       </Row>
       <Row>
-      <Col xs={6} xsOffset={3}>
+      <Col xs={12} sm={6} smOffset={2} >
       <MessageBox groupId = {this.props.groupId} />
       </Col>
 
@@ -361,6 +360,7 @@ class MessageItem extends React.Component {
     this.state = { textUpdate: '',
                    leftCard: this.props.AllMessages.reverse(),
                    rightCard: [],
+                   lastUsedIndex: '',
                  }
     this.componentWillMount = this.componentWillMount.bind(this);
   }
@@ -406,9 +406,10 @@ class MessageItem extends React.Component {
 
 
   //A method to "like" a Message
-  likeMessage() {
+  likeMessage(key) {
     /* Access the Message in the firebase and add this user's name */
-    var MessageRef = firebase.database().ref('groups/' + this.props.group + '/messages/' + this.props.Message.key);
+    console.log(key);
+    var MessageRef = firebase.database().ref('groups/' + this.props.group + '/messages/' + key);
     var MessageLikes = MessageRef.child('likes');
 
     //toggle logic
@@ -430,7 +431,8 @@ class MessageItem extends React.Component {
     var foo = newLeftItems.splice(id, 1);
     this.setState({
       leftCard: newLeftItems,
-      rightCard: this.state.rightCard.concat(foo)
+      rightCard: this.state.rightCard.concat(foo),
+      iVlastUsedIndex: id
     });
     console.log("Called left");
     console.log("LEFT CARDS");
@@ -446,20 +448,20 @@ class MessageItem extends React.Component {
     var foo = newRightItems.splice(id, 1);
     this.setState({
       leftCard: this.state.leftCard.concat(foo),
-      rightCard: newRightItems
+      rightCard: newRightItems,
     });
     console.log("Called right");
     console.log(this.state.rightCard);
   }
 
   render() {
-    var iLike = false;
-    var likeCount = 0; //count likes
-    if (this.props.Message.likes) {
-      likeCount = Object.keys(this.props.Message.likes).length;
-      if (this.props.Message.likes[firebase.auth().currentUser.uid])
-        iLike = true;
-    }
+    // var iLike = false;
+    // var likeCount = 0; //count likes
+    // if (this.props.Message.likes) {
+    //   likeCount = Object.keys(this.props.Message.likes).length;
+    //   if (this.props.Message.likes[firebase.auth().currentUser.uid])
+    //     iLike = true;
+    // }
     var userRef = firebase.database().ref('users/' + this.props.user);
     var user;
     userRef.on('value', (snapshot) => {
@@ -479,8 +481,9 @@ class MessageItem extends React.Component {
               transitionEnterTimeout={3000}
               transitionLeaveTimeout={3000}>
                 {this.state.leftCard.map((item, i) => {
+
                   return (
-                    <Box key={this.props.key}
+                    <Box key={i}
                       /*onClick={this.onItemActionLeft.bind(this, i)}*/
                       className="item">
                       <div onClick={this.onItemActionLeft.bind(this, i)}>
@@ -494,6 +497,7 @@ class MessageItem extends React.Component {
                             <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
                             <p className="caption">{item.caption}</p>
                           </div>
+                          <div className="user"> <span className="handle">{this.props.userObj[item.userId].username}</span></div>
                         </div>
                         }
                         {item.video &&
@@ -501,26 +505,33 @@ class MessageItem extends React.Component {
                           <div className=" message-content "><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
                           <div className="caption-container"> 
                             <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
-                            <div className="caption">{item.caption}</div>
+                            <p className="caption">{item.caption}</p>
                           </div>
+                          <div className="user"> <span className="handle">{this.props.userObj[item.userId].username}</span></div>
                           </div>
                         }
-
-                        {/* Show the text of the Message */}
-                        <div className="Message">{item.text}</div>
-                        <div className="user"> <span className="handle">{this.props.userObj[item.userId].username} {/*space*/}</span></div>
+                        {item.text &&
+                        /* Show the text of the Message */
+                        <div>
+                        <div className="message message-content">{item.text}</div>
+                        <Image className="avatar-with-text" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
+                        
+                        <div className="user"> <span className="handle-with-text">{this.props.userObj[item.userId].username}</span></div>
+                        </div>
+                        }
+                        
                       </div>
-                      {/* Create a section for showing Message likes */}
+                      {/* Create a section for showing Message likes
                       <div className="likes">
 
-                        {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
-                        <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
+                        Show a heart icon that, when clicked, calls like `likeMessage` function
+                        <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage(item.key)} ></i>
 
-                        {/* Show the total number of likes */}
-                        <span>{/*space*/} {likeCount}</span>
+                        Show the total number of likes
+                        <span>space {likeCount}</span>
                       </div>
                       <div> {this.state.show ? <EditBar message={this.props.Message} group={this.props.group} /> : null}
-                      </div>
+                      </div> */}
                     </Box>
                    );
                 })}
@@ -533,55 +544,64 @@ class MessageItem extends React.Component {
               transitionEnterTimeout={3000}
               transitionLeaveTimeout={3000}>
                 {this.state.rightCard.map((item, i) => {
+                  console.log(i + '+' + item.caption)
                   return (
                     <Box key={i}
                       onClick={this.onItemActionRight.bind(this, i)}
                       className="item">
                       <span className="time"><Time value={item.time} relative /></span>
-
-                      {item.image &&
+                        {item.image &&
+                          <div>
+                          <div className="message-content">
+                          <img className="message-img" src={item.image}/>
+                          </div>
+                          <div className="caption-container"> 
+                            <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
+                            <p className="caption">{item.caption}</p>
+                          </div>
+                          <div className="user"> <span className="handle">{this.props.userObj[item.userId].username}</span></div>
+                        </div>
+                        }
+                        {item.video &&
+                          <div>
+                          <div className=" message-content "><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={this.props.Message.video} type='video/mp4'/></video></div>
+                          <div className="caption-container"> 
+                            <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
+                            <p className="caption">{item.caption}</p>
+                          </div>
+                          <div className="user"> <span className="handle">{this.props.userObj[item.userId].username}</span></div>
+                          </div>
+                        }
+                        {item.text &&
+                        /* Show the text of the Message */
                         <div>
-                        <div className="message-content">
-                        <img className="message-img" src={item.image}/>
+                        <div className="message message-content">{item.text}</div>
+                        <Image className="avatar-with-text" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
+                        
+                        <div className="user"> <span className="handle-with-text">{this.props.userObj[item.userId].username}</span></div>
                         </div>
-                        <div className="caption-container"> 
-                        <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
-                          <p className="caption">{item.caption}</p>
-                        </div>
-                      </div>
-                      }
-                      {item.video &&
-                        <div>
-                        <div className=" message-content "><video id="my-video" class="video-js" controls preload="auto"  data-setup="{}"><source src={item.video} type='video/mp4'/></video></div>
-                        <div className="caption-container"> 
-                        <Image className="avatar-with-cap" src={this.props.userObj[item.userId].avatarURL} circle responsive/>
-                          <div className="caption">{item.caption}</div>
-                        </div>
-                        </div>
-                      }
-                      {/* Show the text of the Message */}
-                      <div className="Message">{item.text}</div>
-                      <div className="user"> <span className="handle">{this.props.userObj[item.userId].username} {/*space*/}</span></div>
-
-                      {/* Create a section for showing Message likes */}
+                        }
+                        
+                      
+                      {/* /* Create a section for showing Message likes
                       <div className="likes">
 
-                        {/* Show a heart icon that, when clicked, calls like `likeMessage` function */}
+                        Show a heart icon that, when clicked, calls like `likeMessage` function
                         <i className={'fa fa-heart ' + (iLike ? 'user-liked' : '')} aria-label="like" onClick={() => this.likeMessage()} ></i>
 
-                        {/* Show the total number of likes */}
-                        <span>{/*space*/} {likeCount}</span>
+                        Show the total number of likes
+                        <span>space {likeCount}</span>
                       </div>
                       <div> {this.state.show ? <EditBar message={item} group={this.props.group} /> : null}
-                      </div>
+                      </div> */ }
                     </Box>
                   );
                 })}
             </ReactCSSTransitionGroup>
           </div>
         </div>
+        
         }
-
       </div>
     );
   }

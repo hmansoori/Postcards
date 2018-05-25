@@ -29,7 +29,7 @@ const Navigation = () =>
   //Navbar for when the user is succesfully logged in
   const NavigationAuth = () =>
 
-  <Navbar >
+  <Navbar  collapse>
       <Navbar.Header>
       <a href="/">
         <Navbar.Brand>

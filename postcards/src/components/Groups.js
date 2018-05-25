@@ -126,8 +126,8 @@ class GroupLinks extends React.Component {
         groups.push(newItem);
       }
       return (
-        <div>
-          <Menu className="Group-nav" pageWrapId={"page-wrap"} disableOverlayClick customBurgerIcon={<button className="menu-button"><p className="vertical-label">Choose a Group</p></button>}>
+        <div className="main-container">
+          <Menu className="Group-nav" pageWrapId={"page-wrap"} disableOverlayClick customBurgerIcon={<button className="menu-button">Choose a Group</button>}>
             <h3>Your Groups</h3>
             <ListGroup className="list-unstyled">
               {groups}
