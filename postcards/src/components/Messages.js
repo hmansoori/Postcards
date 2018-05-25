@@ -322,7 +322,7 @@ export class MessageList extends React.Component {
 <div>
   <div>
       <Row class="message-section">
-      <Col xs={12} xsOffset={0} sm={10} smOffset={1} md={10} mdOffset={2} lg={6} lgOffset={3}>
+      <Col xs={12} xsOffset={0} sm={10} smOffset={2} md={10} mdOffset={2} lg={6} lgOffset={3}>
           {messageItems[this.state.index]}
       </Col>
 

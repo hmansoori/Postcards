@@ -28,7 +28,7 @@ html, body {
 
   }
   .item {
-    width: 250px;
+    width: 240px;
     height: 310px;
     
   }
@@ -38,7 +38,7 @@ html, body {
     text-transform: uppercase;
   }
   .message-content {
-    width: 225px;
+    width: 205px;
     height: 200px;
     padding-top: 10px;
     text-align: center;
@@ -172,10 +172,16 @@ html, body {
     text-align: left;
     padding: 10px;
     font-size: 12px;
+    overflow: scroll;
+    margin-bottom: 0px;
   }
   
   .caption-container {
     padding-top: 5px;
+    overflow: scroll;
+    width: 200px;
+    height: 50px;
+    
   }
   .rightTransition-enter {
     opacity: 0;
@@ -206,8 +212,8 @@ html, body {
   transition: transform 1000ms ease-in-out; */
 	/* opacity: 0;
   transition: opacity 100ms ease-out; */
-	transform:   translate(-200px,0);
-	transform: translate3d(-200px,0,0);
+	transform:   translate(-175px,0);
+	transform: translate3d(-175px,0,0);
 }
 
 .leftTransition-enter {
@@ -239,13 +245,29 @@ html, body {
   transition: transform 1000ms ease-in-out; */
 	/* opacity: 0;
   transition: opacity 3000ms ease-out; */
-	transform:   translate(200px,0);
-	transform: translate3d(200px,0,0);
+	transform:   translate(175px,0);
+	transform: translate3d(175px,0,0);
 }
 .handle {
   float: left;
   margin: auto;
-  padding-left: 10px;
+  padding-left: 0px;
+}
+.message {
+  background-color: #e6f2ff;
+  font-size: 16px;
+  margin: auto;
+  padding-top: 50px;
+  border-radius: 10px;
+}
+.avatar-with-text {
+  height: 40px;
+  width: 40px;
+  margin: auto;
+  margin-top: 10px;
+}
+.handle-with-text {
+  margin-top: 10px;
 }
 
 }
@@ -405,6 +427,22 @@ html, body {
       transform:   translate(295px,0);
       transform: translate3d(295px,0,0);
     }
+    .message {
+      background-color: #e6f2ff;
+      font-size: 30px;
+      margin: auto;
+      padding-top: 50px;
+      border-radius: 10px;
+    }
+    .avatar-with-text {
+      height: 60px;
+      width: 60px;
+      margin: auto;
+      margin-top: 15px;
+    }
+    .handle-with-text {
+      margin-top: 10px;
+    }
 }
 
 @media (min-width: 992px) {
@@ -412,22 +450,23 @@ html, body {
         width: 970px; 
     } 
     .item {
-      width: 495px;
-      height: 595px;
+      width: 480px;
+      height: 580px;
     }
     .message-img {
       object-fit: cover;
       overflow: hidden;
       max-width: 100%;
-      height: 425px;
-      width: 445px;
+      height: 415px;
+      width: 435px;
       border-radius: 10px;
     }
     .message-content {
-      width: 445px;
-      height: 445px;
+      width: 435px;
+      height: 415px;
       padding-top: 20px;
       text-align: center;
+      margin: none;
       
     }
     .previewComponent {
@@ -486,7 +525,9 @@ html, body {
     }
     
     .caption-container {
-      padding-top: 10px;
+      padding-top: 30px;
+      width: 440px;
+      height: 95px;
     }
 
     .time {
@@ -499,16 +540,16 @@ html, body {
       transition: transform 1000ms ease-in-out; */
       /* opacity: 0;
       transition: opacity 100ms ease-out; */
-      transform:   translate(-415px,0);
-      transform: translate3d(-415px,0,0);
+      transform:   translate(-405px,0);
+      transform: translate3d(-405px,0,0);
     }
     .leftTransition-leave.leftTransition-leave-active {
       /* transform: translate(-100%);
       transition: transform 1000ms ease-in-out; */
       /* opacity: 0;
       transition: opacity 3000ms ease-out; */
-      transform:   translate(415px,0);
-      transform: translate3d(415px,0,0);
+      transform:   translate(405px,0);
+      transform: translate3d(405px,0,0);
     }
     .handle {
       float: left;
@@ -672,7 +713,7 @@ button.list-group-item {
 
 
 
-.caption {
+/* .caption {
   text-align: left;
   padding: 10px;
   font-size: 18px;
@@ -686,7 +727,7 @@ button.list-group-item {
   padding: 20px 0;
   font-size: 18px;
   text-transform: uppercase;
-}
+} */
 
 /* .message-img {
   object-fit: cover;
@@ -729,14 +770,5 @@ button.list-group-item {
 button {
   border: none;
   background-color: #e6f2ff;
-}
-
-
-
-.vertical-label {
-  transform: rotate(270deg);
-  left: 0px;
-  width: 200px;
-
 }
 
