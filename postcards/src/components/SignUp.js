@@ -5,14 +5,14 @@ import {
 } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import * as routes from '../constants/routes';
-import { Button, FormGroup, FormControl } from 'react-bootstrap';
+import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 import { Col } from 'react-bootstrap';
 import firebase from 'firebase';
 
 
 
 const SignUpPage = ({ history }) =>
-  <div>
+  <div className="signupForm">
     <h1>Sign Up</h1>
     <SignUpForm history={history} />
   </div>
@@ -132,7 +132,7 @@ class SignUpForm extends Component {
             console.log('kept going');
             //this.setState(() => ({ ...INITIAL_STATE }));
             history.push(routes.GROUP);
-            
+
           })
           .catch(error => {
             //this.setState(byPropKey('error', error));
@@ -235,7 +235,7 @@ class SignUpForm extends Component {
 
     if (!usernameFilled) {
       return (
-        <div class="signupForm">
+        <div class="signInForm">
           <h1>what name do you want to go by?</h1>
           <form>
             <FormGroup controlId="username">
@@ -256,10 +256,10 @@ class SignUpForm extends Component {
       );
     } else if (usernameFilled & !emailFilled) {
       return (
-        <div class="signupForm">
+        <div class="signInForm">
           <h1>hey, {this.state.username}! what email do you want to use?</h1>
           <form>
-            <FormGroup controlId="username" validationState={this.state.validEmail}>
+            <FormGroup controlId="email" validationState={this.state.validEmail}>
               <FormControl
                 type="text"
                 value={this.state.email}
@@ -277,7 +277,7 @@ class SignUpForm extends Component {
       );
     } else if (usernameFilled & emailFilled & !passwordFilled) {
       return (
-        <div class="signupForm">
+        <div class="signInForm">
           <h1>set your password</h1>
           <form>
             <FormGroup controlId="password" validationState={this.state.validPassword}>
@@ -308,24 +308,20 @@ class SignUpForm extends Component {
         </div>
       );
     } else if (usernameFilled & emailFilled & passwordFilled & !imageFilled) {
-      // TODO: UPDATE IMAGE STATE TO DEFAULT VALUE AND THEN CHANGE TO USER'S PIC ONCLICK
       return (
-        <div>
+        <div className="signInForm">
           <div className="previewComponent">
             <form onSubmit={(e) => this._handleSubmit(e)} onSelect={(e) => e.stopPropagation()}>
-              <input className="fileInput"
+              <input /*className="fileInput"*/
                 type="file"
                 onSelect={(e) => e.stopPropagation()}
                 onChange={(e) => this._handleImageChange(e)} />
-              {/* <button className="submitButton"
-                type="submit"
-                onClick={(e) => this._handleSubmitImage(e)}>Upload Image</button> */}
             </form>
             <div className="imgPreview">
               {$imagePreview}
             </div>
           </div>
-          <Button bsStyle="primary" 
+          <Button bsStyle="primary"
             onClick={() => this.handleClick('imageFilled')}>
             Continue
           </Button>
@@ -333,9 +329,35 @@ class SignUpForm extends Component {
       )
     } else {
       return (
-        <div><Button bsStyle="primary" onClick={this.onSubmit}>
-          Continue
-        </Button>
+        <div>
+          <h1>name and email confirmation</h1>
+          <form>
+            <FormGroup controlId="username">
+              <ControlLabel>Name:</ControlLabel>
+              <FormControl
+                type="text"
+                value={this.state.username}
+                placeholder="Enter your name here"
+                /*onChange={this.handleChange}*/
+                onChange={event => this.setState(byPropKey('username', event.target.value))}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+            <FormGroup controlId="email">
+            <ControlLabel>Email:</ControlLabel>
+              <FormControl
+                type="text"
+                value={this.state.email}
+                placeholder="Enter your email here"
+                /*onChange={this.handleChange}*/
+                onChange={(e) => this.handleValidEmail(e)}
+              />
+              <FormControl.Feedback />
+            </FormGroup>
+          </form>
+          <Button bsStyle="primary" onClick={this.onSubmit}>
+            Continue
+          </Button>
         </div>
       );
     }
