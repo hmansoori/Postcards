@@ -57,17 +57,16 @@ class GroupLinks extends React.Component {
     var currUser = firebase.auth().currentUser.uid;
     var userRef = firebase.database().ref('users/' + currUser)
     var userObj;
-    userRef.on('value', (snapshot) => {
-      userObj = snapshot.val();
-    })
-    console.log(userObj);
     var newGroup = groupRef.push().key;
     var groupCode = Math.floor(1000 + Math.random() * 9000);
     groupRef.child(newGroup).set({ groupName: this.state.textValue, code: groupCode });
-    groupRef.child(newGroup).child('users').child(currUser).set({
-      username: userObj.username,
-      avatarURL: userObj.avatarURL
-    });
+    userRef.on('value', (snapshot) => {
+      userObj = snapshot.val();
+      groupRef.child(newGroup).child('users').child(currUser).set({
+        username: userObj.username,
+        avatarURL: userObj.avatarURL
+      });
+    })
     userRef.child('groups').child(newGroup).set(this.state.textValue);
     this.setState({ newGroup: { [newGroup]: { groupName: this.state.textValue} } })
     this.setState({open: !this.state.open});
